@@ -1,12 +1,5 @@
-import pygame
-pygame.init() # afeta os imports sendo colocado antes
-
-from pygame.locals import *
 from sys import exit
-from classes import *
-
-
-relogio = pygame.time.Clock()
+from classes import * #locals ja esta vindo
 
 while True:
     tela.fill((250,250,250))

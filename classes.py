@@ -1,39 +1,7 @@
-import os
-from os import remove
-
-import pygame
-from pygame.locals import *
-from pygame import sprite
 from random import randint
 from random import choice
-
-#formação da tela
-tela = pygame.display.set_mode((640,480))
-
-# self nas classes -
-# irão viver na cidade e usar de seus recursos
-#tudo que for da cidade, é reutilizado, recebe self
-# apenas variavel temporaria (visitantes) são livres do self, maldicao da cidade
-
-#formação da cidade - os
-cidade = os.path.dirname(__file__)
-loja_sprites = os.path.join(cidade,'elementos/spritesheet')
-loja_imagens = os.path.join(cidade, 'elementos/sprites')
-loja_cenarios = os.path.join(cidade, 'elementos/cenario')
-loja_som = os.path.join(cidade, 'elementos/som')
-carroca_sprites = pygame.image.load(os.path.join(loja_imagens, 'dinoSpritesheet.png')).convert_alpha()
-carroca_deserto = pygame.image.load(os.path.join(loja_cenarios, 'deserto.png')).convert_alpha()
-carroca_chao = pygame.image.load(os.path.join(loja_cenarios,'chão.png')).convert_alpha()
-carroca_canguru = pygame.image.load(os.path.join(loja_sprites,'canguru.png')).convert_alpha()
-carroca_bumerangue = pygame.image.load(os.path.join(loja_sprites,'bumerangue.png')).convert_alpha()
-carroca_lagarto = pygame.image.load(os.path.join(loja_sprites,'lagarto.png')).convert_alpha()
-carroca_rato = pygame.image.load(os.path.join(loja_sprites,'rato.png')).convert_alpha()
-carroca_dingo = pygame.image.load(os.path.join(loja_sprites,'dingo.png')).convert_alpha()
-carroca_cenario1 = pygame.image.load(os.path.join(loja_cenarios,'fundo.png')).convert_alpha()
-carroca_areia = pygame.image.load(os.path.join(loja_cenarios,'areias.png')).convert_alpha()
-carroca_nuvem = pygame.image.load(os.path.join(loja_cenarios, 'nuvem.png')).convert_alpha()
-carroca_cacto = pygame.image.load(os.path.join(loja_cenarios,'cactos.png')).convert_alpha()
-carroca_osso = pygame.image.load(os.path.join(loja_cenarios,'osso.png')).convert_alpha()
+from recursos import*
+from pygame.locals import *
 
 class Leveis():
 
@@ -477,7 +445,7 @@ class Nuvem(pygame.sprite.Sprite):
         self.spawn = True
         self.x = randint(800,1200)
         self.y = randint(0,45)
-        self.velocidade = -2
+        self.velocidade = -1
         self.movimento = []
         self.movimento.append([self.x, self.y])
 
@@ -520,7 +488,7 @@ class Nuvem2(pygame.sprite.Sprite):
         self.spawn = True
         self.x = randint(800,1200)
         self.y = randint(55,130)
-        self.velocidade = -2
+        self.velocidade = -1
         self.movimento = []
         self.movimento.append([self.x, self.y])
 
@@ -563,7 +531,7 @@ class Nuvem3(pygame.sprite.Sprite):
         self.spawn = True
         self.x = randint(800,1200)
         self.y = randint(150,250)
-        self.velocidade = -2
+        self.velocidade = -1
         self.movimento = []
         self.movimento.append([self.x, self.y])
 
@@ -606,7 +574,7 @@ class Nuvem4(pygame.sprite.Sprite):
         self.spawn = True
         self.x = randint(1400,1600 )
         self.y = randint(150, 250)
-        self.velocidade = -2
+        self.velocidade = -1
         self.movimento = []
         self.movimento.append([self.x, self.y])
 
@@ -649,7 +617,7 @@ class Nuvem5(pygame.sprite.Sprite):
         self.spawn = True
         self.x = randint(1400,1600 )
         self.y = randint(150, 250)
-        self.velocidade = -2
+        self.velocidade = -1
         self.movimento = []
         self.movimento.append([self.x, self.y])
 
@@ -685,63 +653,6 @@ class Nuvem5(pygame.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.rect.topright = i[0], i[1]
             tela.blit(self.image, self.rect)
-
-class Chao(pygame.sprite.Sprite):
-    def __init__ (self, pontos):
-        pygame.sprite.Sprite.__init__(self)
-        self.leveis = pontos
-        self.velocidade = 0
-        self.chao = pygame.image.load('elementos/cenario/chão.png')
-        self.chao = pygame.transform.scale(self.chao, (1469/5,1024/5))
-        self.image = self.chao
-        self.rect = self.image.get_rect()
-        self.quantidade_chao=15
-        self.rua = []
-        self.x = 0
-        self.y = 420
-        colisao = False
-
-        for i in range(self.quantidade_chao): #quantidade que preenche a tela
-            self.rua.append([self.x, self.y])
-            self.x += 40  #cada i soma
-
-    def chao_movimento(self):
-
-        if self.quantidade_chao < 15:
-            self.x += 40
-            self.rua.append([self.x,self.y])
-            self.quantidade_chao += 1
-
-        #Level
-        if self.leveis.lvl_0:
-            self.velocidade = 3
-        if self.leveis.lvl_1:
-            self.velocidade = 4
-        if self.leveis.lvl_2:
-            self.velocidade = 5
-        if self.leveis.lvl_3:
-            self.velocidade = 6
-        if self.leveis.lvl_4:
-            self.velocidade = 7
-        if self.leveis.lvl_5:
-            self.velocidade = 10
-
-        for i in self.rua:
-            i[0] -= self.velocidade
-            self.quantidade_chao -= 1
-
-            if i[0] < -10:
-                self.rua.remove(i)
-
-
-        for i in self.rua:
-
-            self.rect = self.image.get_rect()  # Atualiza o rect da nuvem
-            self.rect.center= i[0], i[1]  # Posiciona o rect conforme a posição da nuvem
-            tela.blit(self.image, self.rect)
-
-    def update(self):
-        self.chao_movimento()
 
 class Dingo (pygame.sprite.Sprite):
     def __init__(self,pontos,bumerangue,canguru):
@@ -1083,53 +994,150 @@ class Osso(pygame.sprite.Sprite):
     def update(self):
         self.osso_on()
 
-class Cenario(pygame.sprite.Sprite):
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.fase_1 = pygame.image.load('elementos/cenario/fundo.png')
-        self.fase_1 = pygame.transform.scale(self.fase_1,(1536/2.2,1024/2.2))
-        self.image = self.fase_1
-        self.rect = self.image.get_rect()
-        self.rect.center = (0, 0)
-
-    def update(self):
-        self.image = self.fase_1
-        self.rect = self.image.get_rect()
-        self.rect.center = (300, 230)
-
 class Montanha(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.x = 320
-        self.y = 180
-        self.velocidade = -0.01
-        self.montanha = pygame.image.load('elementos/cenario/montanha2.png')
-        self.montanha = pygame.transform.scale(self.montanha, (1000,500))
+
+        self.contador = 0
+        self.velocidade = -5
+        self.Sprites()
+
+
+    def Sprites(self):
+        if self.contador == 0:
+            self.x = 315
+            self.y = 185
+            self.montanha = pygame.image.load('elementos/cenario/montanha.png')
+            self.montanha = pygame.transform.scale(self.montanha, (1000,500))
+        elif self.contador == 1:
+            self.x = 1100
+            self.y = 235
+            self.montanha = pygame.image.load('elementos/cenario/montanha2.png')
+            self.montanha = pygame.transform.scale(self.montanha, (1500/2, 600/2))
+
         self.image = self.montanha
         self.rect = self.image.get_rect()
         self.rect.center = (self.x,self.y)
+
     def update(self):
+
+        if self.x <= -450:
+            if self.contador == 0:
+                self.contador +=1
+                self.Sprites()
+            elif self.contador == 1:
+                self.contador = 0
+                self.Sprites()
+                self.x = 1000
+
         self.image = self.montanha
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
         self.x += self.velocidade
-        if self.x <= -250:
-            self.x = 1500
+
+class Montanhas(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.spawn = True
+        self.velocidade = -5
+        self.x = -200
+
+
+    def Sprites(self):
+        self.y = 250
+        self.sorteado = choice([0,1,2,3,4])
+        self.sorteio2 = [x for x in [0, 1, 2, 3] if x != self.sorteado]
+        self.montanhas = []
+
+        imagem_montanhas = carroca_montanhas.subsurface((self.sorteado * 1536, 0), (1536, 1024))
+        imagem_montanhas = pygame.transform.scale(imagem_montanhas, (1536 / 6, 1024 / 6))
+        self.montanhas.append(imagem_montanhas)
+        self.image = self.montanhas[0]
+        self.spawn = False
+        self.movimento = []
+        self.movimento.append([self.x, self.y])
+
+    def Animar(self):
+        for i in self.movimento[:]:
+            i[0] += self.velocidade
+
+            if self.spawn == True:
+                self.movimento.remove(i)
+
+
+
+    def update(self):
+        if montanha.x <= 200 and montanha.x >= 195:
+            self.spawn = True
+            self.x = 900
+        if self.spawn:
+            self.Sprites()
+
+
+        self.Animar()
+
+        for i in self.movimento:
+            self.rect = self.image.get_rect()
+            self.rect.topright = i[0], i[1]
+            tela.blit(self.image, self.rect)
+
+class Montanhas2(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.numeros = [0, 1, 2]
+        self.spawn = True
+        self.velocidade = -5
+        self.x = -200
+
+    def Sprites(self):
+        self.y = 250
+
+        self.sorteado = choice(montanhas.sorteio2)
+
+        self.montanhas = []
+
+        imagem_montanhas = carroca_montanhas.subsurface((self.sorteado * 1536, 0), (1536, 1024))
+        imagem_montanhas = pygame.transform.scale(imagem_montanhas, (1536 / 6, 1024 / 6))
+        self.montanhas.append(imagem_montanhas)
+        self.image = self.montanhas[0]
+        self.spawn = False
+        self.movimento = []
+        self.movimento.append([self.x, self.y])
+
+    def Animar(self):
+        for i in self.movimento[:]:
+            i[0] += self.velocidade
+
+            if self.spawn == True:
+                self.movimento.remove(i)
+
+    def update(self):
+        if montanha.x <= -150 and montanha.x >= -155:
+            self.spawn = True
+            self.x = 900
+        if self.spawn:
+            self.Sprites()
+
+        self.Animar()
+
+        for i in self.movimento:
+            self.rect = self.image.get_rect()
+            self.rect.topright = i[0], i[1]
+            tela.blit(self.image, self.rect)
 
 class Elementos(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.numeros = [0,1,2]
+        self.numeros = [2]
         self.cenario = choice (self.numeros)
         self.spawn = True
         self.x = 900
         self.velocidade = -2
 
-
     def Sprites(self):
         if self.spawn and self.cenario == 0:
             self.y = randint(310, 364)
-            self.sorteio = [0, 1, 2]
+            self.sorteio = [0]
             self.sorteado = choice(self.sorteio)
             self.areias = []
             imagem_areia = carroca_areia.subsurface ((self.sorteado*800,0), (800,200))
@@ -1141,12 +1149,12 @@ class Elementos(pygame.sprite.Sprite):
             self.movimento.append([self.x, self.y])
 
         if self.spawn and self.cenario == 1:
-            self.y = randint(216,270)
-            self.sorteio = [0, 1, 2]
+            self.y = randint(240,290)
+            self.sorteio = [0]
             self.sorteado = choice(self.sorteio)
             self.cactos = []
             imagem_cacto = carroca_cacto.subsurface ((self.sorteado*1536,0), (1536,1024))
-            imagem_cacto = pygame.transform.scale(imagem_cacto, (1536/6,1024/6))
+            imagem_cacto = pygame.transform.scale(imagem_cacto, (1536/7,1024/7))
             self.cactos.append(imagem_cacto)
             self.image = self.cactos[0]
             self.spawn = False
@@ -1155,7 +1163,7 @@ class Elementos(pygame.sprite.Sprite):
 
         if self.spawn and self.cenario == 2:
 
-            self.sorteio = [0,1]
+            self.sorteio = [1]
             self.sorteado = choice(self.sorteio)
             self.ossos = []
             imagem_osso = carroca_osso.subsurface((self.sorteado * 300, 0), (300, 300))
@@ -1176,14 +1184,14 @@ class Elementos(pygame.sprite.Sprite):
                 self.ossos.append(imagem_osso)
 
             elif self.sorteado == 1: #260,270 = /2
-                lugares_osso =[265,270,275,280,290]
+                lugares_osso =[325,330,340,345]
                 self.y = choice(lugares_osso)
-                if self.y in(265,270):
-                    imagem_osso = pygame.transform.scale(imagem_osso, (300 /2, 300 /2))
-                elif self.y in (275, 280):
-                    imagem_osso = pygame.transform.scale(imagem_osso, (300 / 2.5, 300 / 2.5))
-                elif self.y == 290:
-                    imagem_osso = pygame.transform.scale(imagem_osso, (300 /3, 300 /3))
+                if self.y in(345,340):
+                    imagem_osso = pygame.transform.scale(imagem_osso, (300 /4.5, 300 /4.5))
+                elif self.y == 325:
+                    imagem_osso = pygame.transform.scale(imagem_osso, (300 / 5.5, 300 / 5.5))
+                elif self.y == 330:
+                    imagem_osso = pygame.transform.scale(imagem_osso, (300 /3.5, 300 /3.5))
 
                 self.ossos.append(imagem_osso)
             self.image = self.ossos[0]
@@ -1225,7 +1233,7 @@ class Elementos2(pygame.sprite.Sprite):
     def Sprites(self):
         if self.spawn and self.cenario == 0:
             self.y = randint(310, 364)
-            self.sorteio = [0, 1]
+            self.sorteio = [1]
             self.sorteado = choice(self.sorteio)
             self.areias = []
             imagem_areia = carroca_areia.subsurface((self.sorteado * 800, 0), (800, 200))
@@ -1238,7 +1246,7 @@ class Elementos2(pygame.sprite.Sprite):
 
         if self.spawn and self.cenario == 1:
             self.y = randint(216, 270)
-            self.sorteio = [0, 1, 2]
+            self.sorteio = [1]
             self.sorteado = choice(self.sorteio)
             self.cactos = []
             imagem_cacto = carroca_cacto.subsurface((self.sorteado * 1536, 0), (1536, 1024))
@@ -1279,7 +1287,7 @@ class Elementos2(pygame.sprite.Sprite):
 class Elementos3(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.numeros = [0, 1, 2]
+        self.numeros = [0,1,2]
         self.cenario = choice(self.numeros)
         self.spawn = True
         self.x = 1500
@@ -1288,7 +1296,7 @@ class Elementos3(pygame.sprite.Sprite):
     def Sprites(self):
         if self.spawn and self.cenario == 0:
             self.y = randint(310, 364)
-            self.sorteio = [0, 1, 2]
+            self.sorteio = [2]
             self.sorteado = choice(self.sorteio)
             self.areias = []
             imagem_areia = carroca_areia.subsurface((self.sorteado * 800, 0), (800, 200))
@@ -1301,7 +1309,7 @@ class Elementos3(pygame.sprite.Sprite):
 
         if self.spawn and self.cenario == 1:
             self.y = randint(216, 270)
-            self.sorteio = [0, 1, 2]
+            self.sorteio = [2]
             self.sorteado = choice(self.sorteio)
             self.cactos = []
             imagem_cacto = carroca_cacto.subsurface((self.sorteado * 1536, 0), (1536, 1024))
@@ -1314,21 +1322,21 @@ class Elementos3(pygame.sprite.Sprite):
 
         if self.spawn and self.cenario == 2:
 
-            self.sorteio = [0, 1]
+            self.sorteio = [0]
             self.sorteado = choice(self.sorteio)
             self.ossos = []
             imagem_osso = carroca_osso.subsurface((self.sorteado * 300, 0), (300, 300))
 
             if self.sorteado == 0:
 
-                lugares_osso = [285, 290, 300]
+                lugares_osso = [330]
                 self.y = choice(lugares_osso)
-                if self.y == 300:
-                    imagem_osso = pygame.transform.scale(imagem_osso, (300 / 3, 300 / 3))
-                elif self.y == 290:
-                    imagem_osso = pygame.transform.scale(imagem_osso, (300 / 2.2, 300 / 2.2))
-                elif self.y == 285:
-                    imagem_osso = pygame.transform.scale(imagem_osso, (300 / 2, 300 / 2))
+                if self.y == 325:
+                    imagem_osso = pygame.transform.scale(imagem_osso, (300 / 6.5, 300 / 6.5))
+                elif self.y == 330:
+                    imagem_osso = pygame.transform.scale(imagem_osso, (300 / 5, 300 / 5))
+                elif self.y == 340:
+                    imagem_osso = pygame.transform.scale(imagem_osso, (300 / 4, 300 / 4))
 
                 self.ossos.append(imagem_osso)
 
@@ -1370,8 +1378,540 @@ class Elementos3(pygame.sprite.Sprite):
             self.rect.topright = i[0], i[1]
             tela.blit(self.image, self.rect)
 
+class Grama(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.numeros = [0,1,2]
+        self.cenario = choice(self.numeros)
+        self.spawn = True
+        self.x = 200
+        self.velocidade = -2
 
-#personagens
+    def Sprites(self):
+
+        self.y = randint(315, 320)
+        self.sorteio = [3,4,5]
+        self.sorteado = choice(self.sorteio)
+        self.gramas = []
+        imagem_grama = carroca_grama.subsurface((self.sorteado * 600, 0), (600, 600))
+        imagem_grama = pygame.transform.scale(imagem_grama, (600 / 6, 600 / 6))
+        self.gramas.append(imagem_grama)
+        self.image = self.gramas[0]
+        self.spawn = False
+        self.movimento = []
+        self.movimento.append([self.x, self.y])
+
+    def Animar(self):
+        for i in self.movimento[:]:
+            i[0] += self.velocidade
+
+            if i[0] <= -100:
+                self.movimento.remove(i)
+                self.cenario = choice(self.numeros)
+                self.spawn = True
+                self.sorteado = choice(self.sorteio)
+                self.x = 900
+                self.y = randint(315, 320)
+                self.movimento.append([self.x, self.y])
+
+    def update(self):
+        if self.spawn:
+            self.Sprites()
+        self.Animar()
+
+        for i in self.movimento:
+            self.rect = self.image.get_rect()
+            self.rect.topright = i[0], i[1]
+            tela.blit(self.image, self.rect)
+
+class Grama2(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.numeros = [0,1,2]
+        self.cenario = choice(self.numeros)
+        self.spawn = True
+        self.x = 500
+        self.velocidade = -2
+
+    def Sprites(self):
+
+        self.y = randint(315, 320)
+        self.sorteio = [0,1,2]
+        self.sorteado = choice(self.sorteio)
+        self.gramas = []
+        imagem_grama = carroca_grama.subsurface((self.sorteado * 600, 0), (600, 600))
+        imagem_grama = pygame.transform.scale(imagem_grama, (600 / 6, 600 / 6))
+        self.gramas.append(imagem_grama)
+        self.image = self.gramas[0]
+        self.spawn = False
+        self.movimento = []
+        self.movimento.append([self.x, self.y])
+
+    def Animar(self):
+        for i in self.movimento[:]:
+            i[0] += self.velocidade
+
+            if i[0] <= -100:
+                self.movimento.remove(i)
+                self.cenario = choice(self.numeros)
+                self.spawn = True
+                self.sorteado = choice(self.sorteio)
+                self.x = 1200
+                self.y = randint(315, 320)
+                self.movimento.append([self.x, self.y])
+
+    def update(self):
+        if self.spawn:
+            self.Sprites()
+        self.Animar()
+
+        for i in self.movimento:
+            self.rect = self.image.get_rect()
+            self.rect.topright = i[0], i[1]
+            tela.blit(self.image, self.rect)
+
+class Grama3(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.numeros = [0,1,2,3,4,5]
+        self.cenario = choice(self.numeros)
+        self.spawn = True
+        self.x = 900
+        self.velocidade = -2
+
+    def Sprites(self):
+
+        self.y = randint(315, 320)
+        self.sorteio = [0,1,2]
+        self.sorteado = choice(self.sorteio)
+        self.gramas = []
+        imagem_grama = carroca_grama.subsurface((self.sorteado * 600, 0), (600, 600))
+        imagem_grama = pygame.transform.scale(imagem_grama, (600 / 6, 600 / 6))
+        self.gramas.append(imagem_grama)
+        self.image = self.gramas[0]
+        self.spawn = False
+        self.movimento = []
+        self.movimento.append([self.x, self.y])
+
+    def Animar(self):
+        for i in self.movimento[:]:
+            i[0] += self.velocidade
+
+            if i[0] <= -100:
+                self.movimento.remove(i)
+                self.cenario = choice(self.numeros)
+                self.spawn = True
+                self.sorteado = choice(self.sorteio)
+                self.x = 1400
+                self.y = randint(315, 320)
+                self.movimento.append([self.x, self.y])
+
+    def update(self):
+        if self.spawn:
+            self.Sprites()
+        self.Animar()
+
+        for i in self.movimento:
+            self.rect = self.image.get_rect()
+            self.rect.topright = i[0], i[1]
+            tela.blit(self.image, self.rect)
+
+class Tufo(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.contador_liberar = 0
+        self.atual_tufo = 0
+        self.velocidade = 4
+        self.x = 700
+        self.y = choice([320, 350])
+        self.spawn = False
+        self.contador = True
+        self.movimento = [[self.x, self.y]]
+
+        self.Sprites()
+
+    def get_layer(self):
+        # Define a camada de desenho com base no Y
+        return 3 if self.y == 320 else 5
+
+    def Sprites(self):
+        self.tufo = []
+        for i in range(5):
+            imagem_tufo = carroca_tufo.subsurface((i * 1536, 0), (1536, 1024))
+            if self.y == 350:
+                imagem_tufo = pygame.transform.scale(imagem_tufo, (1536 // 15, 1024 // 15))
+            elif self.y == 320:
+                imagem_tufo = pygame.transform.scale(imagem_tufo, (1536 // 20, 1024 // 20))
+            self.tufo.append(imagem_tufo)
+
+        self.image = self.tufo[0]
+        self.rect = self.image.get_rect()
+        self.rect.topright = 0, 0
+
+    def Animar(self):
+        self.contador = False
+        self.image = self.tufo[int(self.atual_tufo)]
+        self.atual_tufo += 0.20
+        if self.atual_tufo >= len(self.tufo):
+            self.atual_tufo = 0
+
+        for i in self.movimento:
+            i[0] -= self.velocidade
+            self.rect = self.image.get_rect()
+            self.rect.topright = i[0], i[1]
+            tela.blit(self.image, self.rect)
+
+            if i[0] <= -1:
+                self.movimento.remove(i)
+                self.x = 700
+                self.y = choice([320, 350])
+                self.movimento.append([self.x, self.y])
+                self.Sprites()  #Redimensiona com base no novo Y
+                self.contador = True
+                self.spawn = False
+                grupos = self.groups()
+                if grupos:
+                    grupo = grupos[0]
+                    grupo.change_layer(self, self.get_layer())
+
+    def update(self):
+        if self.spawn:
+            self.Animar()
+
+        if self.contador:
+            self.contador_liberar += 1
+            if self.contador_liberar >= 100:
+                self.sorteio = randint(0, 500)
+                if self.sorteio == 1:
+                    self.spawn = True
+
+class Chao(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.x = 183
+        self.y = 418
+        self.velocidade = -1
+
+
+        self.chao = pygame.image.load('elementos/cenario/chão.png')
+        self.chao = pygame.transform.scale(self.chao, (1469/4,1024/4))
+
+        self.image = self.chao
+        self.movimento = [[self.x, self.y]]  # apenas uma lista com a posição
+
+        self.rect = self.image.get_rect()
+        self.rect.center = self.x, self.y
+
+    def Animar(self):
+        for i in self.movimento[:]:
+            i[0] += self.velocidade
+            if i[0] <= -184:
+                self.x = 914
+                self.y = 420
+                self.image = self.chao
+                self.movimento = [[self.x, self.y]]
+
+
+    def update(self):
+        self.Animar()
+
+        for i in self.movimento:
+            self.rect = self.image.get_rect()
+            self.rect.center = i[0], i[1]
+            tela.blit(self.image, self.rect)
+
+class Chao2(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.x = 550
+        self.y = 418
+        self.velocidade = -1
+
+
+        self.chao = pygame.image.load('elementos/cenario/chão.png')
+        self.chao = pygame.transform.scale(self.chao, (1469/4,1024/4))
+
+        self.image = self.chao
+        self.movimento = [[self.x, self.y]]  # apenas uma lista com a posição
+
+        self.rect = self.image.get_rect()
+        self.rect.center = self.x, self.y
+
+    def Animar(self):
+        for i in self.movimento[:]:
+            i[0] += self.velocidade
+            if i[0] <= -184:
+                self.x = 914
+                self.y = 420
+                self.image = self.chao
+                self.movimento = [[self.x, self.y]]
+
+
+    def update(self):
+        self.Animar()
+
+        for i in self.movimento:
+            self.rect = self.image.get_rect()
+            self.rect.center = i[0], i[1]
+            tela.blit(self.image, self.rect)
+
+class Chao3(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.x = 914
+        self.y = 418
+        self.velocidade = -1
+
+
+        self.chao = pygame.image.load('elementos/cenario/chão.png')
+        self.chao = pygame.transform.scale(self.chao, (1469/4,1024/4))
+
+        self.image = self.chao
+        self.movimento = [[self.x, self.y]]  # apenas uma lista com a posição
+
+        self.rect = self.image.get_rect()
+        self.rect.center = self.x, self.y
+
+    def Animar(self):
+        for i in self.movimento[:]:
+            i[0] += self.velocidade
+            if i[0] <= -184:
+                self.x = 914
+                self.y = 420
+                self.image = self.chao
+                self.movimento = [[self.x, self.y]]
+
+
+    def update(self):
+        self.Animar()
+
+        for i in self.movimento:
+            self.rect = self.image.get_rect()
+            self.rect.center = i[0], i[1]
+            tela.blit(self.image, self.rect)
+
+class Dia(pygame.sprite.Sprite):
+    def __init__(self, noite,lua):
+        pygame.sprite.Sprite.__init__(self)
+        self.reset = False
+        self.noite = noite
+        self.x = 300
+        self.y = 230
+        self.velocidade = 0
+        self.fase1 = pygame.image.load('elementos/cenario/dia.png')
+        self.fase1 = pygame.transform.scale(self.fase1, (1536 / 2, 1024 / 2))
+        self.image = self.fase1
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x, self.y)
+
+
+    def update(self):
+        if lua.amanheceu:
+            self.velocidade = 10
+            if self.y == 230:
+                self.velocidade = 0
+
+        elif sol.anoiteceu:
+            self.velocidade = 10
+            if self.y >= 650:
+                self.velocidade = 0
+                self.y = -160
+                sol.anoiteceu = False #virou noite
+
+        self.y += self.velocidade
+        self.image = self.fase1
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x, self.y)
+
+class Noite(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.chao = False
+
+        self.x = 300
+        self.y = -160
+        self.velocidade = 0
+        self.noite = pygame.image.load('elementos/cenario/noite.png')
+        self.noite = pygame.transform.scale(self.noite, (1536 / 2, 1024 / 2))
+        self.image = self.noite
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x, self.y)
+
+
+    def update(self):
+
+
+        if sol.anoiteceu:
+            self.velocidade = 10
+            if self.y == 230:
+                self.velocidade = 0
+
+        elif lua.amanheceu:
+            self.velocidade = 10
+            if self.y >= 650:
+                self.velocidade = 0
+                self.y = -160
+                lua.amanheceu = False #virou noite
+        self.y += self.velocidade
+        self.image = self.noite
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x, self.y)
+
+class Chaodia(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.saiu = False
+        self.entrou = False
+        self.fundo = True
+        self.x = 300
+        self.y = 230
+        self.velocidade = 10
+        self.fase1 = pygame.image.load('elementos/cenario/chao_dia.png')
+        self.fase1 = pygame.transform.scale(self.fase1, (1536 / 2.2, 1024 / 2.2))
+        self.image = self.fase1
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x, self.y)
+
+    def get_layer(self):
+        # Define a camada de desenho com base no Y
+        return 1 if self.fundo else 2.1
+#for entrrar, camada 1
+    def update(self):
+#se for amanhecer, dia camada baixo
+        if dia.y >= 100:
+            self.velocidade = 10
+            self.y -= self.velocidade
+            if self.y > 230:
+                self.velocidade = 10
+                self.y -= self.velocidade
+            else:
+                self.y = 230
+                self.velocidade = 0
+
+
+
+
+        elif noite.y == 230:
+
+            self.velocidade = 10
+            self.y += self.velocidade
+            if self.y >= 460:
+                self.y = 460
+                self.fundo = True
+                chaonoite.fundo = False
+
+
+
+        grupos = self.groups()
+        if grupos:
+            grupo = grupos[0]
+            grupo.change_layer(self, self.get_layer())
+        self.image = self.fase1
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x, self.y)
+
+class Chaonoite(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.saiu = False
+        self.manha = True
+        self.noite = False
+        self.fundo = False
+        self.entrou = False
+        self.escureceu = False
+        self.x = 300
+        self.y = 460
+        self.velocidade = 10
+        self.fase1 = pygame.image.load('elementos/cenario/chao_noite.png')
+        self.fase1 = pygame.transform.scale(self.fase1, (1536 / 2.2, 1024 / 2.2))
+        self.image = self.fase1
+        self.rect = self.image.get_rect()
+        self.rect.center = (-1000, -1000)
+
+    def get_layer(self):
+        return 0.9
+
+    def update(self):
+
+        if noite.y >= 100:
+            self.velocidade = 10
+            self.y -= self.velocidade
+            if self.y > 230:
+                self.velocidade = 10
+                self.y -= self.velocidade
+            else:
+                self.y = 230
+                self.velocidade = 0
+
+
+        elif dia.y == 230:
+            self.velocidade = 10
+            self.y += self.velocidade
+            if self.y >= 460:
+                self.y = 460
+                self.saiu = True
+                self.fundo= True
+                chaodia.fundo = False
+
+        self.image = self.fase1
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x, self.y)
+
+class Sol(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.anoiteceu = False
+        self.reset = False
+        self.x = 550
+        self.y = -70
+        self.velocidade = 0
+        self.sol = pygame.image.load('elementos/cenario/sol.png')
+        self.sol = pygame.transform.scale(self.sol, (1024/6,1024/6))
+        self.image = self.sol
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x,self.y)
+
+
+    def update(self):
+        if dia.y >= 230 and not self.anoiteceu:
+            self.velocidade = 5
+
+        if self.y >= 450:
+            self.anoiteceu = True
+            self.velocidade =0
+            self.y = -70  # Volta para o topo
+
+        self.y += self.velocidade
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x, self.y)
+
+class Lua(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.amanheceu = False
+        self.x = 100
+        self.y = -65
+        self.velocidade = 0
+        self.lua = pygame.image.load('elementos/cenario/lua.png')
+        self.lua = pygame.transform.scale(self.lua, (1024/6,1024/6))
+        self.image = self.lua
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x,self.y)
+
+    def update(self):
+        if noite.y >= 230 and not self.amanheceu:
+            self.velocidade = 5
+        if self.y >= 450:
+            self.amanheceu = True
+            self.velocidade = 0
+            self.y = -65  # Volta para o topo
+
+        self.y += self.velocidade
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x, self.y)
+
+
+#classes
 pontos = Leveis()
 elementos = Elementos()
 elementos2 = Elementos2()
@@ -1383,18 +1923,49 @@ nuvem4 = Nuvem4()
 nuvem5 = Nuvem5()
 canguru = Canguru()
 fase = Fases(pontos)
-chao = Chao(pontos)
+chao = Chao()
+chao2 = Chao2()
+chao3 = Chao3()
 lagarto = Lagarto(pontos,canguru)
 aereo = Aereos(pontos)
 bumerangue = Bumerangue(canguru)
 dingo = Dingo(pontos,bumerangue,canguru)
 osso = Osso(pontos,aereo,canguru)
 canguru.bumerangue = bumerangue
-
-cenario = Cenario()
+tufo = Tufo()
+grama = Grama()
+grama2 = Grama2()
+grama3 = Grama3()
+noite = Noite()
+lua = Lua()
+dia = Dia(noite,lua)
 montanha = Montanha()
+sol = Sol()
+chaodia =Chaodia()
+chaonoite = Chaonoite()
+montanhas = Montanhas()
+montanhas2=Montanhas2()
 
-#grupo de classes
-game = pygame.sprite.Group()
-game.add(cenario,nuvem,nuvem2,nuvem3,nuvem4,nuvem5,montanha,elementos,elementos2,elementos3,
-              lagarto,aereo,canguru,bumerangue,chao,dingo,osso)
+#junção classes
+montanhas.montanha = montanha
+montanhas2.montanhas = montanhas
+montanhas2.montanha = montanha
+dia.sol = sol
+lua.sol = sol
+sol.dia=dia
+chaodia.dia = dia
+noite.dia = dia
+
+#grupo e camadas
+game = pygame.sprite.LayeredUpdates()
+game.add(noite,lua,dia,sol, layer=0)
+game.add(layer=1)
+game.add(nuvem, nuvem2, nuvem3, nuvem4, nuvem5,chaonoite,chaodia, layer=2)
+game.add(montanha,montanhas,montanhas2,grama,grama2,grama3, layer=3)
+game.add(elementos, elementos2, elementos3,chao,chao2,chao3, layer=4)
+game.add(lagarto, layer=6)
+game.add(aereo, canguru, bumerangue, layer=7)
+game.add( dingo, osso,sol,lua, layer=8)
+game.add(layer=tufo.get_layer())
+game.add(layer=chaodia.get_layer())
+
