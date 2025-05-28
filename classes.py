@@ -697,6 +697,8 @@ class Item_vida(pygame.sprite.Sprite):
                 # REMOVE A POSIÇÃO ANTIGA E CRIA UMA NOVA
             if self.spawn == False:
                 self.movimento.remove(i)
+            if canguru.morreu:
+                self.movimento.remove(i)
 
     def Colisao(self):
         self.vida_hitbox = pygame.Rect(self.rect.x + 10, self.rect.y + 3, 55, 50)
@@ -740,13 +742,14 @@ class Item_vida(pygame.sprite.Sprite):
 
     def update(self):
         self.Sprites()
-        self.Animacao()
-        for i in self.movimento:
-            self.image = pygame.transform.scale(self.image, (586/8,426/8))
-            self.rect = self.image.get_rect()
-            self.rect.topright = i[0], i[1]
-            tela.blit(self.image, self.rect)
-        self.Colisao()
+        if not canguru.morreu:
+            self.Animacao()
+            for i in self.movimento:
+                self.image = pygame.transform.scale(self.image, (586/8,426/8))
+                self.rect = self.image.get_rect()
+                self.rect.topright = i[0], i[1]
+                tela.blit(self.image, self.rect)
+            self.Colisao()
 
 class Bumerangue(pygame.sprite.Sprite):
     def __init__(self,canguru):
@@ -5908,6 +5911,7 @@ class Gameover_continue (pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
 
         self.continue_selecionado = False
+        self.iniciar_continue = False
 
         self.x = 320
         self.y = 180
@@ -5945,6 +5949,7 @@ class Gameover_continue (pygame.sprite.Sprite):
                 self.velocidade = 0
                 self.oscilando = False
                 self.continue_selecionado = False
+                self.iniciar_continue = True
 
         self.rect.centerx = self.x + self.offset_x
         self.rect.centery = self.y
@@ -5957,6 +5962,7 @@ class Gameover_quit (pygame.sprite.Sprite):
 
         # Flag que será definida externamente quando o bumerangue selecionar
         self.quit_selecionado = False
+        self.iniciar_quit = False
 
         self.x = 320
         self.y = 175
@@ -5997,6 +6003,7 @@ class Gameover_quit (pygame.sprite.Sprite):
                 self.velocidade = 0
                 self.oscilando = False
                 self.quit_selecionado = False
+                self.iniciar_quit = True
 
 
         self.rect.centerx = self.x + self.offset_x

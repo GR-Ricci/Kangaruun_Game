@@ -1,6 +1,93 @@
 from sys import exit
 from classes import * #locals ja esta vindo
 
+def Reset():
+    pontos.__init__()
+
+    canguru.__init__()
+    vidas_rosto.__init__()
+    vidas_numeros.__init__()
+    dano.__init__()
+    bumerangue.__init__(canguru)
+    colisao.__init__()
+
+    canguru.bumerangue = bumerangue  # reatribui porque __init__ apagou essa ligação
+
+    item_vida.__init__()
+
+    rato.__init__(pontos)
+    rato2.__init__(pontos)
+    rato3.__init__(pontos)
+    rato4.__init__(pontos)
+    rato5.__init__(pontos)
+    rato6.__init__(pontos)
+
+    osso.__init__(pontos, rato, canguru)
+    osso2.__init__(pontos, rato2, canguru)
+    osso3.__init__(pontos, rato3, canguru)
+    osso4.__init__(pontos, rato4, canguru)
+    osso5.__init__(pontos, rato5, canguru)
+    osso6.__init__(pontos, rato6, canguru)
+
+    lagarto.__init__(pontos, canguru, bumerangue)
+    lagarto2.__init__(pontos, canguru, bumerangue)
+    lagarto3.__init__(pontos, canguru, bumerangue)
+    lagarto4.__init__(pontos, canguru, bumerangue)
+    lagarto5.__init__(pontos, canguru, bumerangue)
+
+    dingo.__init__(pontos, bumerangue, canguru.bumerangue)
+    dingo2.__init__(pontos, bumerangue, canguru.bumerangue)
+    dingo3.__init__(pontos, bumerangue, canguru.bumerangue)
+    dingo4.__init__(pontos, bumerangue, canguru.bumerangue)
+    dingo5.__init__(pontos, bumerangue, canguru.bumerangue)
+    dingo6.__init__(pontos, bumerangue, canguru.bumerangue)
+
+    gameover.__init__()
+    gameover_continue.__init__()
+    gameover_quit.__init__()
+    gameover_bumerangue.__init__()
+
+    elementos.__init__()
+    elementos2.__init__()
+    elementos3.__init__()
+    nuvem.__init__()
+    nuvem2.__init__()
+    nuvem3.__init__()
+    nuvem4.__init__()
+    nuvem5.__init__()
+    fase.__init__(pontos)
+    chao.__init__()
+    chao2.__init__()
+    chao3.__init__()
+    tufo.__init__()
+    grama.__init__()
+    grama2.__init__()
+    grama3.__init__()
+    noite.__init__()
+    lua.__init__()
+    dia.__init__(noite, lua)
+    montanha.__init__()
+    sol.__init__()
+    chaodia.__init__()
+    chaonoite.__init__()
+    montanhas.__init__()
+    montanhas2.__init__()
+
+    # Reatribui referências que você fez antes (se precisarem)
+    canguru.vidas_numeros = vidas_numeros
+    montanhas.montanha = montanha
+    montanhas2.montanhas = montanhas
+    montanhas2.montanha = montanha
+    dia.sol = sol
+    lua.sol = sol
+    sol.dia = dia
+    chaodia.dia = dia
+    noite.dia = dia
+
+
+    # ---------junção classes--------------#
+
+
 while True:
     tela.fill((250,250,250))
     relogio.tick(60)
@@ -52,6 +139,12 @@ while True:
 
     game.update()
     game.draw(tela)
+    if gameover_continue.iniciar_continue:
+        Reset()
+    if gameover_quit.iniciar_quit:
+        pygame.quit()
+        exit()
+
     gerenciador.update()
 
     item_vida.Colisao()
