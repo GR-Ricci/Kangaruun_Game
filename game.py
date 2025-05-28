@@ -43,9 +43,10 @@ while True:
                     gameover_bumerangue.bumerangue_selecionado = True
 
 
-        if not canguru.gameover:
+        if not canguru.morreu:
             if not canguru.pulando and 485 <= canguru.rect.centery <= 530:
                 canguru.agachado = pygame.key.get_pressed()[K_DOWN]
+
 
     #pontos.update()
 
@@ -53,18 +54,22 @@ while True:
     game.draw(tela)
     gerenciador.update()
 
-    bumerangue.Colisao()
-    dingo.Colisao()
-    dingo2.Colisao()
-    dingo3.Colisao()
-    dingo4.Colisao()
-    dingo5.Colisao()
-    dingo6.Colisao()
+    item_vida.Colisao()
+    #bumerangue.Colisao()
+    #dingo.Colisao()
+    #dingo2.Colisao()
+    #dingo3.Colisao()
+    #dingo4.Colisao()
+    #dingo5.Colisao()
+    #dingo6.Colisao()
 
-    lagarto.Colisao()
-    osso.Colisao()
-    rato.colisao()
-    canguru.Colisao()
+    #lagarto.Colisao()
+    #osso.Colisao()
+    #osso3.Colisao()
+
+    #rato.colisao()
+    #rato3.colisao()
+    #canguru.Colisao()
     colisao.update()
     dano.update()
 

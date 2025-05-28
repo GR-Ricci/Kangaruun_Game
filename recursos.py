@@ -14,7 +14,7 @@ loja_cenarios = os.path.join(cidade, 'elementos/cenario')
 loja_som = os.path.join(cidade, 'elementos/som')
 loja_efeitos = os.path.join(cidade,'elementos/efeitos')
 loja_menu = os.path.join(cidade,'elementos/menus')
-
+loja_item = os.path.join(cidade,'elementos/itens')
 #carrocas
 carroca_deserto = pygame.image.load(os.path.join(loja_cenarios, 'deserto.png')).convert_alpha()
 carroca_chao = pygame.image.load(os.path.join(loja_cenarios,'chão.png')).convert_alpha()
@@ -44,3 +44,4 @@ carroca_gameover_continue = pygame.image.load(os.path.join(loja_menu,'continue.p
 carroca_gameover_quit = pygame.image.load(os.path.join(loja_menu,'quit.png')).convert_alpha()
 carroca_gameover_quit_quebrado = pygame.image.load(os.path.join(loja_menu,'quit_quebrado.png')).convert_alpha()
 carroca_gameover_continue_quebrado = pygame.image.load(os.path.join(loja_menu,'continue_quebrado.png')).convert_alpha()
+carroca_vida = pygame.image.load(os.path.join(loja_item,'vida.png')).convert_alpha()

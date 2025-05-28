@@ -81,12 +81,25 @@ class Gerenciador(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.tempo = 0
+        self.ligar_gerenciador = True
 
-        self.sorteio = choice ([1,2,3])
+        self.sorteio = randint (1,13)
         self.grupos = {
-            1: [lagarto,dingo,rato],
-            2: [dingo,dingo2,dingo3,dingo4,dingo5,dingo6],
-            3: [lagarto,lagarto2,lagarto3,lagarto4,lagarto5]}
+            1: [lagarto, dingo, rato],
+            2: [lagarto, lagarto3, dingo2, rato3],
+            3: [rato2, rato3, dingo5, dingo6, dingo3],
+            4: [lagarto, lagarto3,dingo, dingo2,  rato5, rato2],
+            5: [lagarto2, lagarto3, dingo5, dingo3, dingo],
+            6: [lagarto4, lagarto2,dingo,rato],
+            7: [dingo, rato, rato5, rato],
+            8: [lagarto, lagarto2,dingo, rato, rato4],
+
+            # waves
+            9: [dingo, dingo2, dingo4, dingo5, rato2],
+            10: [dingo, dingo2, dingo3, dingo4, dingo5, dingo6],
+            11: [lagarto, lagarto2, lagarto4, lagarto5,rato3,rato6,dingo4,dingo],
+            12: [rato, rato2, rato3, rato4, rato5,rato6],
+            13: [rato, rato2, rato3, rato4, rato5,rato6,dingo3,dingo5]}
 
 
     def sorteador(self):
@@ -95,18 +108,25 @@ class Gerenciador(pygame.sprite.Sprite):
             for i, v in enumerate(grupo_atual):
                 v.spawn = True
                 v.spawn_on = False
-                self.tempo = 0
+                self.ligar_gerenciador = False
         else:
-            self.tempo += 1
-            if (not self.sorteio == 2) or (self.sorteio == 3):
-                if self.tempo == 120:
-                    self.sorteio = choice([1, 2,3])
-            else:
-                if self.tempo == 200:
-                    self.sorteio = choice([1, 2,3])
+            self.ligar_gerenciador = True
 
     def update(self):
-        self.sorteador()
+        if self.ligar_gerenciador:
+            self.sorteador()
+        else:
+            self.tempo +=1
+            if self.sorteio not in [9,10,11,13]:
+                if self.tempo == 200:
+                    self.tempo = 0
+                    self.sorteio = randint(1, 12)
+                    self.ligar_gerenciador = True
+            else:
+                if self.tempo == 300:
+                    self.tempo = 0
+                    self.sorteio = randint(1, 12)
+                    self.ligar_gerenciador = True
 
 #Personagens
 class Canguru(pygame.sprite.Sprite):
@@ -125,6 +145,8 @@ class Canguru(pygame.sprite.Sprite):
         self.atual_morto = 0
         self.atual_correndo = 0
         self.gravidade = 0
+        self.bug_bumerangue = 0
+        self.ferido = False
         self.morreu = False
         self.gameover = False
         self.gameover2 = False
@@ -244,16 +266,34 @@ class Canguru(pygame.sprite.Sprite):
             if self.rect.centerx > self.origem:
                 self.rect.centerx -= self.volta_mais
             else:
-                self.rect.centerx = self.origem
-                self.avanco = False  # Finaliza tudo
-                self.volta_rapido = False
+                if not self.pulando:
+                    self.rect.centerx = self.origem
+                    self.avanco = False
+                    self.volta_rapido = False
 
     def atacar(self):
         if self.bumerangue.ataca:
+            self.bug_bumerangue +=1
             self.atacando = True
             self.animar = False
         else:
+            self.bug_bumerangue =0
             self.atacando = False
+
+        if self.bug_bumerangue >= 100:
+            self.bumerangue.ataca = False
+            self.atacando = False
+            self.animar = True
+            bumerangue.ataca = False
+            bumerangue.reload = True
+            bumerangue.movimento_x = 0
+            bumerangue.movimento_y = 0
+            bumerangue.y_fixo = 0
+            bumerangue.indo = True
+            bumerangue.voltando = False
+            bumerangue.contador_bumerangue = 0
+
+            bumerangue.rect.center = (-100, -100)
 
     def pular(self):
         if pygame.key.get_pressed()[K_DOWN]and pygame.key.get_pressed()[K_UP] and not self.pulando:
@@ -302,6 +342,7 @@ class Canguru(pygame.sprite.Sprite):
             self.gravidade += 2
             self.image = self.queda_imagem
             self.image = pygame.transform.scale(self.image, (438 / 4, 315 / 4))
+
 
         if not self.pulando and self.queda:
             self.pulando = False
@@ -418,6 +459,9 @@ class Canguru(pygame.sprite.Sprite):
             if pygame.key.get_pressed()[K_UP] and not self.pulando:
                 self.buffer_pulo = True
 
+            if self.pulando and self.volta_rapido:
+                self.image = self.queda_imagem
+                self.image = pygame.transform.scale(self.image, (438 / 4, 315 / 4))
 
             elif self.pulando and not self.queda:
                 if self.image != self.queda_imagem:
@@ -467,7 +511,6 @@ class Canguru(pygame.sprite.Sprite):
                     self.contador_colisao = 0
 
             self.Colisao()
-
 class Vidas_numeros(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -497,6 +540,11 @@ class Vidas_numeros(pygame.sprite.Sprite):
             self.vidas -= 1
             self.dano = False
 
+        if item_vida.ganha_vida and self.vidas < 3 and self.vidas > 0:
+            self.vidas +=1
+            item_vida.ganha_vida = False
+
+
         elif self.vidas == 0:
             canguru.morreu = True
             self.contador_gameover += 1
@@ -508,11 +556,14 @@ class Vidas_numeros(pygame.sprite.Sprite):
 
         if self.coracao:
             self.vidas += 1
+        if self.vidas < 3:
+            canguru.ferido = True
+        else:
+            canguru.ferido = False
 
         self.image = self.numeros[self.vidas]
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
-
 class Vidas_rosto(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -539,13 +590,12 @@ class Vidas_rosto(pygame.sprite.Sprite):
             self.vidas += 1
             self.dano = False
 
-        if self.coracao:
-            self.vidas +=1
+        if item_vida.ganha_vida and self.vidas < 3 and self.vidas > 0:
+            self.vidas -=1
 
         self.image = self.rostos[self.vidas]
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
-
 class Dano_canguru(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -598,6 +648,105 @@ class Dano_canguru(pygame.sprite.Sprite):
                     canguru.contador_colisao = 0
                     self.image = None
                     self.rect = None
+
+class Item_vida(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.sorteio = choice([1,2])
+        self.y = -100
+        self.x = -100
+        self.ganha_vida = False
+        self.ganha = 0
+        self.spawn = True
+        self.reset = False
+        self.contador_vida = 0
+        self.liberar = 0
+        self.sorteio = 0
+        self.movimento = []
+        self.velocidade = 1
+        self.movimento.append([self.x, self.y])
+
+    def Sprites(self):
+        self.vida = []
+        for i in range (3):
+            vida = carroca_vida.subsurface((i*586,0),(586,426))
+            vida = pygame.transform.scale(vida,(588/8,426/8))
+            self.vida.append(vida)
+
+        self.image = self.vida[0]
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x,self.y)
+
+    def Animacao(self):
+        self.image = self.vida[int(self.contador_vida)]
+
+        if self.spawn == False:
+           self.contador_vida = 2
+           self.velocidade = 0
+        else:
+            self.contador_vida += 0.05
+            self.velocidade = 1
+            if self.contador_vida >= len(self.vida)-1:
+                self.contador_vida = 0
+
+        for i in self.movimento:
+            i[0] -= self.velocidade
+            if i[0] <= -10 and not canguru.morreu:
+                self.spawn = False
+                self.liberar = 0
+                # REMOVE A POSIÇÃO ANTIGA E CRIA UMA NOVA
+            if self.spawn == False:
+                self.movimento.remove(i)
+
+    def Colisao(self):
+        self.vida_hitbox = pygame.Rect(self.rect.x + 10, self.rect.y + 3, 55, 50)
+        pygame.draw.rect(tela, (0, 0, 250), self.vida_hitbox, 2)
+        canguru_hitbox = canguru.Colisao()
+
+        if canguru.ferido:
+
+            if self.sorteio == 1:
+                for hitbox in canguru_hitbox:
+                    if self.vida_hitbox.colliderect(hitbox) and not canguru.baixo:
+                        self.ganha_vida = True
+
+                        self.liberar = 0
+                        self.spawn = False
+                        self.reset = True
+                        print('vida')
+
+            if self.sorteio == 2:
+                for hitbox in canguru_hitbox:
+                    if self.vida_hitbox.colliderect(hitbox) and canguru.baixo:
+                        self.ganha_vida = True
+
+                        self.liberar = 0
+                        self.spawn = False
+                        self.reset = True
+                        print('vida')
+
+
+        if self.spawn == False:
+            self.liberar +=1
+            if self.liberar >= 4000:
+                self.sorteio = choice([1, 2])
+                if self.sorteio == 1:
+                    self.y = randint(0, 370)  # 410
+                elif self.sorteio == 2:
+                    self.y = randint(390, 410)  # 410
+                self.x = 1000
+                self.movimento.append([self.x, self.y])
+                self.spawn = True
+
+    def update(self):
+        self.Sprites()
+        self.Animacao()
+        for i in self.movimento:
+            self.image = pygame.transform.scale(self.image, (586/8,426/8))
+            self.rect = self.image.get_rect()
+            self.rect.topright = i[0], i[1]
+            tela.blit(self.image, self.rect)
+        self.Colisao()
 
 class Bumerangue(pygame.sprite.Sprite):
     def __init__(self,canguru):
@@ -681,6 +830,20 @@ class Bumerangue(pygame.sprite.Sprite):
                         self.y_fixo = min(alvo_y, self.y_fixo + ajuste)
                     elif self.y_fixo > alvo_y:
                         self.y_fixo = max(alvo_y, self.y_fixo - ajuste)
+                if percentual < 0.2:
+                    ajuste = 100
+                    # Força o y_fixo a ir diretamente para o alvo
+                    if self.y_fixo < alvo_y:
+                        self.y_fixo = min(alvo_y, self.y_fixo + ajuste)
+                    elif self.y_fixo > alvo_y:
+                        self.y_fixo = max(alvo_y, self.y_fixo - ajuste)
+                if percentual < 0.1:
+                    ajuste = 200
+                    # Força o y_fixo a ir diretamente para o alvo
+                    if self.y_fixo < alvo_y:
+                        self.y_fixo = min(alvo_y, self.y_fixo + ajuste)
+                    elif self.y_fixo > alvo_y:
+                        self.y_fixo = max(alvo_y, self.y_fixo - ajuste)
             else:
                 # Ajuste suave normal
                 if self.y_fixo < alvo_y:
@@ -723,7 +886,6 @@ class Bumerangue(pygame.sprite.Sprite):
 
         else:
             self.reset_bumerangue()
-
 class Colisao(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -783,7 +945,7 @@ class Dingo (pygame.sprite.Sprite):
 
     def get_layer(self):
         # Define a camada de desenho com base no Y
-        return 8.1 if self.y == 300 else 8
+        return 7.1 if self.y == 300 else 6
 
     def Sprites(self):
 
@@ -930,7 +1092,7 @@ class Dingo2 (pygame.sprite.Sprite):
 
     def get_layer(self):
         # Define a camada de desenho com base no Y
-        return 8.2 if self.y == 300 else 8
+        return 7.2 if self.y == 300 else 6
 
     def Sprites(self):
         if self.y == 300:
@@ -988,7 +1150,7 @@ class Dingo2 (pygame.sprite.Sprite):
                 if self.y != dingo.y:
                     self.x = randint(1100, 1250)
                 else:
-                    self.x = 1200  # Novo X
+                    self.x = 1200
                 self.andando.append([self.x, self.y])  # Nova posição
 
 
@@ -1082,7 +1244,7 @@ class Dingo3 (pygame.sprite.Sprite):
 
     def get_layer(self):
         # Define a camada de desenho com base no Y
-        return 8.3 if self.y == 300 else 8
+        return 7.3 if self.y == 300 else 6
 
     def Sprites(self):
 
@@ -1220,14 +1382,14 @@ class Dingo4 (pygame.sprite.Sprite):
 
         self.y = choice([268, 300])
         if self.y != dingo3.y:
-            self.x = randint(1300,1450)
+            self.x = randint(1400,1550)
         else:
-            self.x = 1400
+            self.x = 1550
         self.andando.append([self.x, self.y])
 
     def get_layer(self):
         # Define a camada de desenho com base no Y
-        return 8.4 if self.y == 300 else 8
+        return 7.4 if self.y == 300 else 6
 
     def Sprites(self):
 
@@ -1277,10 +1439,10 @@ class Dingo4 (pygame.sprite.Sprite):
                 self.andando.remove(i)
                 self.y = choice([268, 300])
                 if self.y != dingo3.y:
-                    self.x = randint(1300, 1450)
+                    self.x = randint(1400, 1550)
                 else:
-                    self.x = 1400
-                self.andando.append([self.x, self.y])  # Nova posição
+                    self.x = 1550
+                self.andando.append([self.x, self.y]) # Nova posição
 
 
 
@@ -1366,14 +1528,14 @@ class Dingo5 (pygame.sprite.Sprite):
 
         self.y = choice([268, 300])
         if self.y != dingo4.y:
-            self.x = randint(1400,1550)
+            self.x = randint(1600,1750)
         else:
-            self.x = 1500
+            self.x = 1650
         self.andando.append([self.x, self.y])
 
     def get_layer(self):
         # Define a camada de desenho com base no Y
-        return 8.5 if self.y == 300 else 8
+        return 7.5 if self.y == 300 else 6
 
     def Sprites(self):
 
@@ -1423,10 +1585,10 @@ class Dingo5 (pygame.sprite.Sprite):
                 self.andando.remove(i)
                 self.y = choice([268, 300])
                 if self.y != dingo4.y:
-                    self.x = randint(1400, 1550)
+                    self.x = randint(1600, 1750)
                 else:
-                    self.x = 1500
-                self.andando.append([self.x, self.y])  # Nova posição
+                    self.x = 1650
+                self.andando.append([self.x, self.y])
 
                 # ATUALIZA cima/baixo DE FORMA SEGURA
 
@@ -1513,14 +1675,14 @@ class Dingo6 (pygame.sprite.Sprite):
 
         self.y = choice([268, 300])
         if self.y != dingo5.y:
-            self.x = randint(1500,1650)
+            self.x = randint(1800,1900)
         else:
-            self.x = 1600
+            self.x = 1850
         self.andando.append([self.x, self.y])
 
     def get_layer(self):
         # Define a camada de desenho com base no Y
-        return 8.6 if self.y == 300 else 8
+        return 7.6 if self.y == 300 else 6
 
     def Sprites(self):
 
@@ -1570,9 +1732,9 @@ class Dingo6 (pygame.sprite.Sprite):
                 self.andando.remove(i)
                 self.y = choice([268, 300])
                 if self.y != dingo5.y:
-                    self.x = randint(1500, 1650)
+                    self.x = randint(1800, 1900)
                 else:
-                    self.x = 1600 # Novo X
+                    self.x = 1850
                 self.andando.append([self.x, self.y])  # Nova posição
 
 
@@ -1649,7 +1811,7 @@ class Lagarto(pygame.sprite.Sprite):
         self.canguru = canguru
         self.bumerangue = bumerangue
         self.x = 900
-        self.y = choice ([272,272])
+        self.y = choice ([240,272])
         self.estado_anterior = "parado"
 
         self.contador_bumerangue = 0
@@ -1742,7 +1904,10 @@ class Lagarto(pygame.sprite.Sprite):
                 self.spawn_on = True
                 self.y = choice([240, 272])
                 self.andando.append([self.x, self.y])
-
+                grupos = self.groups()
+                if grupos:
+                    grupo = grupos[0]
+                    grupo.change_layer(self, self.get_layer())
             if (not canguru.morreu and
                     100 <= i[0] - self.canguru.rect.x <= 320 and
                     not self.kill and
@@ -1756,6 +1921,9 @@ class Lagarto(pygame.sprite.Sprite):
             else:
                 self.ataque = False
                 self.parado = True
+    def get_layer(self):
+        # Define a camada de desenho com base no Y
+        return 7.9 if self.y == 272 else 6
 
     def Colisao(self):
         if not self.kill:
@@ -1822,11 +1990,11 @@ class Lagarto(pygame.sprite.Sprite):
             if self.y == 272:
                 self.baixo = True
                 self.cima = False
-                print('lagarto baixo')
+
             if self.y == 240:
                 self.cima = True
                 self.baixo = False
-                print('lagarto cima')
+
 
             for i in self.andando:
                 self.rect = self.image.get_rect()  #image ja foi deifinido pela lista de lagartos, ele ja existe independentre
@@ -1935,7 +2103,10 @@ class Lagarto2(pygame.sprite.Sprite):
                 self.x = randint(1200, 1300)
                 self.y = choice([240, 272])
                 self.andando.append([self.x, self.y])
-
+                grupos = self.groups()
+                if grupos:
+                    grupo = grupos[0]
+                    grupo.change_layer(self, self.get_layer())
             if (not canguru.morreu and
                     100 <= i[0] - self.canguru.rect.x <= 320 and
                     not self.kill and
@@ -1950,6 +2121,9 @@ class Lagarto2(pygame.sprite.Sprite):
                 self.ataque = False
                 self.parado = True
 
+    def get_layer(self):
+        # Define a camada de desenho com base no Y
+        return 7.9 if self.y == 272 else 6
     def Colisao(self):
         if not self.kill:
             canguru_hitbox = canguru.Colisao()
@@ -2127,7 +2301,10 @@ class Lagarto3(pygame.sprite.Sprite):
                 self.x = randint(1400, 1500)
                 self.y = choice([240, 272])
                 self.andando.append([self.x, self.y])
-
+                grupos = self.groups()
+                if grupos:
+                    grupo = grupos[0]
+                    grupo.change_layer(self, self.get_layer())
             if (not canguru.morreu and
                     100 <= i[0] - self.canguru.rect.x <= 320 and
                     not self.kill and
@@ -2141,7 +2318,9 @@ class Lagarto3(pygame.sprite.Sprite):
             else:
                 self.ataque = False
                 self.parado = True
-
+    def get_layer(self):
+        # Define a camada de desenho com base no Y
+        return 7.9 if self.y == 272 else 6
     def Colisao(self):
         if not self.kill:
             canguru_hitbox = canguru.Colisao()
@@ -2319,7 +2498,10 @@ class Lagarto4(pygame.sprite.Sprite):
                 self.x = randint(1600, 1750)
                 self.y = choice([240, 272])
                 self.andando.append([self.x, self.y])
-
+                grupos = self.groups()
+                if grupos:
+                    grupo = grupos[0]
+                    grupo.change_layer(self, self.get_layer())
             if (not canguru.morreu and
                     100 <= i[0] - self.canguru.rect.x <= 320 and
                     not self.kill and
@@ -2333,7 +2515,9 @@ class Lagarto4(pygame.sprite.Sprite):
             else:
                 self.ataque = False
                 self.parado = True
-
+    def get_layer(self):
+        # Define a camada de desenho com base no Y
+        return 7.9 if self.y == 272 else 6
     def Colisao(self):
         if not self.kill:
             canguru_hitbox = canguru.Colisao()
@@ -2459,7 +2643,9 @@ class Lagarto5(pygame.sprite.Sprite):
         self.image = self.lagartos[0]
         self.rect = self.image.get_rect()
         self.rect.center = -200, -200
-
+    def get_layer(self):
+        # Define a camada de desenho com base no Y
+        return 7.9 if self.y == 272 else 6
     def Animacao(self):
 
         if self.kill:
@@ -2512,7 +2698,10 @@ class Lagarto5(pygame.sprite.Sprite):
                 self.x = randint(1800, 1900)
                 self.y = choice([240, 272])
                 self.andando.append([self.x, self.y])
-
+                grupos = self.groups()
+                if grupos:
+                    grupo = grupos[0]
+                    grupo.change_layer(self, self.get_layer())
             if (not canguru.morreu and
                     100 <= i[0] - self.canguru.rect.x <= 320 and
                     not self.kill and
@@ -2616,10 +2805,11 @@ class Rato(pygame.sprite.Sprite):
         self.velocidade_voo = 0
         self.velocidade = 0.10
         self.altura = [10,69,200]
-        self.ataques = [400,500,600]
-        self.atacar = choice(self.ataques)
+        #self.ataques = [500]
+
+        self.atacar = randint(400,500)
         self.x = 1000
-        self.y = choice(self.altura)
+        self.y = 0
         self.voando = [] #para gerenciar x e y
         self.voando.append([self.x, self.y])
         self.spawn = False
@@ -2660,6 +2850,7 @@ class Rato(pygame.sprite.Sprite):
             if self.rect.x <= self.atacar + 5 and self.rect.x >= self.atacar - 5 and not self.atacando and not self.kill:
                 self.voar = False
                 self.atacando = True
+
 
     def animar(self):
 
@@ -2741,7 +2932,7 @@ class Rato(pygame.sprite.Sprite):
                 self.morto = False
                 self.kill = False
                 self.contador = 0
-                self.y = choice(self.altura)
+                self.y = 0
                 self.voando.append([self.x, self.y])
                 self.spawn = False
                 self.spawn_on = True
@@ -2784,17 +2975,12 @@ class Rato(pygame.sprite.Sprite):
 
     def update(self):
         self.sprites()
+
         if self.spawn:
             self.spawn_on = False
             self.animar()
-            self.colisao()
-            self.ataque()
-
-
-
             for i in self.voando:
                 if self.kill:
-
                     self.image = pygame.transform.scale(self.image, (400 // 3, 400 // 2.8))
                     if self.kill and not self.morto:
                         i[1] -= 30
@@ -2805,6 +2991,9 @@ class Rato(pygame.sprite.Sprite):
                 self.rect = self.image.get_rect()  # Atualiza o rect da nuvem
                 self.rect.topright = i[0], i[1]  # Posiciona o rect conforme a posição da nuvem
                 tela.blit(self.image, self.rect)
+
+            self.ataque()
+            self.colisao()
 class Rato2(pygame.sprite.Sprite):
     def __init__(self,pontos):
         pygame.sprite.Sprite.__init__(self)
@@ -2816,10 +3005,11 @@ class Rato2(pygame.sprite.Sprite):
         self.velocidade_voo = 0
         self.velocidade = 0.10
         self.altura = [10,69,200]
-        self.ataques = [400,500,600]
-        self.atacar = choice(self.ataques)
-        self.x = 1000
-        self.y = choice(self.altura)
+        #self.ataques = [500]
+
+        self.atacar = randint(400,500)
+        self.x = 1080
+        self.y = 50
         self.voando = [] #para gerenciar x e y
         self.voando.append([self.x, self.y])
         self.spawn = False
@@ -2860,6 +3050,7 @@ class Rato2(pygame.sprite.Sprite):
             if self.rect.x <= self.atacar + 5 and self.rect.x >= self.atacar - 5 and not self.atacando and not self.kill:
                 self.voar = False
                 self.atacando = True
+
 
     def animar(self):
 
@@ -2941,7 +3132,7 @@ class Rato2(pygame.sprite.Sprite):
                 self.morto = False
                 self.kill = False
                 self.contador = 0
-                self.y = choice(self.altura)
+                self.y = 50
                 self.voando.append([self.x, self.y])
                 self.spawn = False
                 self.spawn_on = True
@@ -2984,17 +3175,12 @@ class Rato2(pygame.sprite.Sprite):
 
     def update(self):
         self.sprites()
+
         if self.spawn:
             self.spawn_on = False
             self.animar()
-            self.colisao()
-            self.ataque()
-
-
-
             for i in self.voando:
                 if self.kill:
-
                     self.image = pygame.transform.scale(self.image, (400 // 3, 400 // 2.8))
                     if self.kill and not self.morto:
                         i[1] -= 30
@@ -3005,6 +3191,9 @@ class Rato2(pygame.sprite.Sprite):
                 self.rect = self.image.get_rect()  # Atualiza o rect da nuvem
                 self.rect.topright = i[0], i[1]  # Posiciona o rect conforme a posição da nuvem
                 tela.blit(self.image, self.rect)
+
+            self.ataque()
+            self.colisao()
 class Rato3(pygame.sprite.Sprite):
     def __init__(self,pontos):
         pygame.sprite.Sprite.__init__(self)
@@ -3016,10 +3205,11 @@ class Rato3(pygame.sprite.Sprite):
         self.velocidade_voo = 0
         self.velocidade = 0.10
         self.altura = [10,69,200]
-        self.ataques = [400,500,600]
-        self.atacar = choice(self.ataques)
+        #self.ataques = [500]
+
+        self.atacar = randint(400,500)
         self.x = 1000
-        self.y = choice(self.altura)
+        self.y = 100
         self.voando = [] #para gerenciar x e y
         self.voando.append([self.x, self.y])
         self.spawn = False
@@ -3060,6 +3250,7 @@ class Rato3(pygame.sprite.Sprite):
             if self.rect.x <= self.atacar + 5 and self.rect.x >= self.atacar - 5 and not self.atacando and not self.kill:
                 self.voar = False
                 self.atacando = True
+
 
     def animar(self):
 
@@ -3141,7 +3332,7 @@ class Rato3(pygame.sprite.Sprite):
                 self.morto = False
                 self.kill = False
                 self.contador = 0
-                self.y = choice(self.altura)
+                self.y = 100
                 self.voando.append([self.x, self.y])
                 self.spawn = False
                 self.spawn_on = True
@@ -3184,17 +3375,12 @@ class Rato3(pygame.sprite.Sprite):
 
     def update(self):
         self.sprites()
+
         if self.spawn:
             self.spawn_on = False
             self.animar()
-            self.colisao()
-            self.ataque()
-
-
-
             for i in self.voando:
                 if self.kill:
-
                     self.image = pygame.transform.scale(self.image, (400 // 3, 400 // 2.8))
                     if self.kill and not self.morto:
                         i[1] -= 30
@@ -3205,6 +3391,9 @@ class Rato3(pygame.sprite.Sprite):
                 self.rect = self.image.get_rect()  # Atualiza o rect da nuvem
                 self.rect.topright = i[0], i[1]  # Posiciona o rect conforme a posição da nuvem
                 tela.blit(self.image, self.rect)
+
+            self.ataque()
+            self.colisao()
 class Rato4(pygame.sprite.Sprite):
     def __init__(self,pontos):
         pygame.sprite.Sprite.__init__(self)
@@ -3216,10 +3405,11 @@ class Rato4(pygame.sprite.Sprite):
         self.velocidade_voo = 0
         self.velocidade = 0.10
         self.altura = [10,69,200]
-        self.ataques = [400,500,600]
-        self.atacar = choice(self.ataques)
-        self.x = 1000
-        self.y = choice(self.altura)
+        #self.ataques = [500]
+
+        self.atacar = randint(400,500)
+        self.x = 1080
+        self.y = 150
         self.voando = [] #para gerenciar x e y
         self.voando.append([self.x, self.y])
         self.spawn = False
@@ -3260,6 +3450,7 @@ class Rato4(pygame.sprite.Sprite):
             if self.rect.x <= self.atacar + 5 and self.rect.x >= self.atacar - 5 and not self.atacando and not self.kill:
                 self.voar = False
                 self.atacando = True
+
 
     def animar(self):
 
@@ -3341,7 +3532,7 @@ class Rato4(pygame.sprite.Sprite):
                 self.morto = False
                 self.kill = False
                 self.contador = 0
-                self.y = choice(self.altura)
+                self.y = 150
                 self.voando.append([self.x, self.y])
                 self.spawn = False
                 self.spawn_on = True
@@ -3384,17 +3575,12 @@ class Rato4(pygame.sprite.Sprite):
 
     def update(self):
         self.sprites()
+
         if self.spawn:
             self.spawn_on = False
             self.animar()
-            self.colisao()
-            self.ataque()
-
-
-
             for i in self.voando:
                 if self.kill:
-
                     self.image = pygame.transform.scale(self.image, (400 // 3, 400 // 2.8))
                     if self.kill and not self.morto:
                         i[1] -= 30
@@ -3405,6 +3591,9 @@ class Rato4(pygame.sprite.Sprite):
                 self.rect = self.image.get_rect()  # Atualiza o rect da nuvem
                 self.rect.topright = i[0], i[1]  # Posiciona o rect conforme a posição da nuvem
                 tela.blit(self.image, self.rect)
+
+            self.ataque()
+            self.colisao()
 class Rato5(pygame.sprite.Sprite):
     def __init__(self,pontos):
         pygame.sprite.Sprite.__init__(self)
@@ -3416,10 +3605,11 @@ class Rato5(pygame.sprite.Sprite):
         self.velocidade_voo = 0
         self.velocidade = 0.10
         self.altura = [10,69,200]
-        self.ataques = [400,500,600]
-        self.atacar = choice(self.ataques)
+        #self.ataques = [500]
+
+        self.atacar = randint(400,500)
         self.x = 1000
-        self.y = choice(self.altura)
+        self.y = 200
         self.voando = [] #para gerenciar x e y
         self.voando.append([self.x, self.y])
         self.spawn = False
@@ -3460,6 +3650,7 @@ class Rato5(pygame.sprite.Sprite):
             if self.rect.x <= self.atacar + 5 and self.rect.x >= self.atacar - 5 and not self.atacando and not self.kill:
                 self.voar = False
                 self.atacando = True
+
 
     def animar(self):
 
@@ -3541,7 +3732,7 @@ class Rato5(pygame.sprite.Sprite):
                 self.morto = False
                 self.kill = False
                 self.contador = 0
-                self.y = choice(self.altura)
+                self.y = 200
                 self.voando.append([self.x, self.y])
                 self.spawn = False
                 self.spawn_on = True
@@ -3584,17 +3775,12 @@ class Rato5(pygame.sprite.Sprite):
 
     def update(self):
         self.sprites()
+
         if self.spawn:
             self.spawn_on = False
             self.animar()
-            self.colisao()
-            self.ataque()
-
-
-
             for i in self.voando:
                 if self.kill:
-
                     self.image = pygame.transform.scale(self.image, (400 // 3, 400 // 2.8))
                     if self.kill and not self.morto:
                         i[1] -= 30
@@ -3605,6 +3791,210 @@ class Rato5(pygame.sprite.Sprite):
                 self.rect = self.image.get_rect()  # Atualiza o rect da nuvem
                 self.rect.topright = i[0], i[1]  # Posiciona o rect conforme a posição da nuvem
                 tela.blit(self.image, self.rect)
+
+            self.ataque()
+            self.colisao()
+class Rato6(pygame.sprite.Sprite):
+    def __init__(self,pontos):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.leveis = pontos
+        self.estado_anterior = "parado"
+        self.contador = 0
+        self.contador_ataque = 0
+        self.velocidade_voo = 0
+        self.velocidade = 0.10
+        self.altura = [10,69,200]
+        #self.ataques = [500]
+
+        self.atacar = randint(400,500)
+        self.x = 1600
+        self.y = 50
+        self.voando = [] #para gerenciar x e y
+        self.voando.append([self.x, self.y])
+        self.spawn = False
+        self.spawn_on = True
+        self.kill = False
+        self.atacando = False
+        self.atacou = False
+        self.voar = True
+        self.morto = False
+
+
+    def sprites (self):
+
+        self.lista_morte =[]
+        for i in [0,1,2,3]:
+            morte_rato = carroca_morte2.subsurface((i*400,0), (400,400))
+            self.lista_morte.append(morte_rato)
+
+        self.lista_aereo = []
+        self.lista_aereo.append(carroca_rato.subsurface((0*500,0),(500,500)))
+        self.lista_aereo.append(carroca_rato.subsurface((1*500,0),(500,500)))
+
+        self.lista_atacou = []
+        self.lista_atacou.append(carroca_rato.subsurface((4*500,0), (500,500)))
+        self.lista_atacou.append(carroca_rato.subsurface((5*500,0), (500,500)))
+
+        self.lista_atacando = []
+        self.lista_atacando.append(carroca_rato.subsurface((2*500,0),(500,500)))
+        self.lista_atacando.append(carroca_rato.subsurface((3* 500, 0), (500, 500)))
+
+        self.image = self.lista_aereo[int(self.velocidade)]
+        self.image = pygame.transform.scale(self.image, (500 // 4, 500 // 4))
+        self.rect = self.image.get_rect()
+        self.rect.center = (-200, -200)
+
+    def ataque(self):
+        if not canguru.morreu:
+            if self.rect.x <= self.atacar + 5 and self.rect.x >= self.atacar - 5 and not self.atacando and not self.kill:
+                self.voar = False
+                self.atacando = True
+
+
+    def animar(self):
+
+    #-------------fases------------------#
+        if self.leveis.lvl_0:
+            self.velocidade = 0.05
+            self.velocidade_voo = 4
+            if self.kill:
+                self.velocidade = 0.15
+        elif self.leveis.lvl_1:  # Só verifica se lvl_0 for False
+            self.velocidade = 0.08
+            self.velocidade_voo = 6
+        elif self.leveis.lvl_2:  # Só verifica se os anteriores forem False
+            self.velocidade = 0.10
+            self.velocidade_voo = 9
+        elif self.leveis.lvl_3:
+            self.velocidade = 0.13
+            self.velocidade_voo = 11
+        elif self.leveis.lvl_4:
+            self.velocidade = 0.15
+            self.velocidade_voo = 13
+        elif self.leveis.lvl_5:
+            self.velocidade = 0.16
+            self.velocidade_voo = 15
+        #---------------------------------#
+
+        if self.kill:
+            estado_atual = 'morte'
+        elif self.atacando:
+            estado_atual = 'atacando'
+        elif self.atacou:
+            estado_atual = 'atacou'
+        elif self.voar:
+            estado_atual = 'voando'
+        else:
+            estado_atual = 'idle'
+
+        if hasattr(self, 'estado_anterior') and self.estado_anterior != estado_atual:
+            self.contador = 0
+        self.estado_anterior = estado_atual
+
+        if self.kill:
+            self.atacou = False
+            self.atacando = False
+            self.voar = True
+            if self.contador >= len(self.lista_morte):
+                self.contador= 3
+            if self.contador <= 4:
+                self.image = self.lista_morte[int(self.contador)]
+                self.contador += self.velocidade
+
+        elif self.atacando and not self.kill:
+            if self.contador >= len(self.lista_atacando):
+                self.atacando = False
+                self.atacou = True
+                self.contador = 0
+            self.image = self.lista_atacando[int(self.contador)]
+            self.contador += self.velocidade
+
+        elif self.voar and not self.kill:
+            if self.contador >= len(self.lista_aereo):
+                self.contador = 0
+            self.image = self.lista_aereo[int(self.contador)]
+            self.contador += self.velocidade
+
+        elif self.atacou and not self.atacando and not self.kill:
+            if self.contador >= len(self.lista_atacou):
+                self.contador = 0
+            self.image = self.lista_atacou[int(self.contador)]
+            self.contador += self.velocidade
+
+        for i in self.voando:
+            i[0] -= self.velocidade_voo
+            if i[0] < -1 and not canguru.morreu:
+                self.atacou = False
+                self.atacando = False
+                self.voar = True
+                self.voando.remove(i)
+                self.morto = False
+                self.kill = False
+                self.contador = 0
+
+                self.y = 50
+                self.voando.append([self.x, self.y])
+                self.spawn = False
+                self.spawn_on = True
+
+
+    def colisao(self):
+        if not self.kill:
+            canguru_hitbox = canguru.Colisao()
+
+            for i in self.voando:
+
+                self.image = pygame.transform.scale(self.image, (500 // 4, 500 // 4))
+                corpo_hitbox = pygame.Rect(self.rect.x + 40, self.rect.y + 80, 40, 40)
+                pygame.draw.rect(tela, (255, 0, 0), corpo_hitbox, 2)
+                cabeca_hitbox = pygame.Rect(self.rect.x + 20, self.rect.y + 40, 40, 40)
+                pygame.draw.rect(tela, (255, 0, 0), cabeca_hitbox, 2)
+                rato_hitbox = pygame.Rect(self.rect.x + 40, self.rect.y + 0, 40, 80)
+                pygame.draw.rect(tela, (255, 0, 0), rato_hitbox, 2)
+
+
+                for hitbox in canguru_hitbox:
+                    if (corpo_hitbox.colliderect(hitbox) or cabeca_hitbox.colliderect(hitbox)
+                            or rato_hitbox.colliderect(hitbox)):
+                        print("COLIDIU COM O Rato!")
+                        if canguru.contador_colisao == 0:
+                            vidas_rosto.dano = True
+                            vidas_numeros.dano = True
+                            canguru.contador_colisao = 1
+
+                if bumerangue is not None:  # Se o bumerangue existe
+                    bumerangue_hitbox = bumerangue.Colisao() or []  # Se Colisao() retornar None, usa lista vazia
+                    for hitbox in bumerangue_hitbox:
+                        if (corpo_hitbox.colliderect(hitbox) or cabeca_hitbox.colliderect(hitbox)
+                            or rato_hitbox.colliderect(hitbox)):
+                            print("bumerangue acertou rato")
+                            bumerangue.indo = False
+                            bumerangue.voltando = True
+                            bumerangue.acertou = True
+                            self.kill = True
+
+    def update(self):
+        self.sprites()
+
+        if self.spawn:
+            self.spawn_on = False
+            self.animar()
+            for i in self.voando:
+                if self.kill:
+                    self.image = pygame.transform.scale(self.image, (400 // 3, 400 // 2.8))
+                    if self.kill and not self.morto:
+                        i[1] -= 30
+                        self.morto = True
+                else:
+                    self.image = pygame.transform.scale(self.image, (500 // 4, 500 // 4))
+
+                self.rect = self.image.get_rect()  # Atualiza o rect da nuvem
+                self.rect.topright = i[0], i[1]  # Posiciona o rect conforme a posição da nuvem
+                tela.blit(self.image, self.rect)
+
+            self.ataque()
+            self.colisao()
 
 class Osso(pygame.sprite.Sprite):
     def __init__(self,pontos,rato,canguru):
@@ -3622,7 +4012,7 @@ class Osso(pygame.sprite.Sprite):
 
     def Sprites(self):
         self.osso = []
-        for i in range (6,13):
+        for i in range (6,14):
             imagem_osso = carroca_rato.subsurface((i * 500, 0), (500, 500))
             imagem_osso = pygame.transform.scale(imagem_osso, (500/3, 500/3))
             self.osso.append(imagem_osso)
@@ -3631,40 +4021,684 @@ class Osso(pygame.sprite.Sprite):
         self.rect.center = (-100, -100)
 
     def osso_on(self):
-        self.contador_osso += 0.20
-        if self.contador_osso > len(self.osso):
-            self.contador_osso = 0
-        self.image = self.osso[int(self.contador_osso)]
+        # Animação do osso (se houver)
+        # Mantém a lógica de animação original
+        self.contador_osso += 0.5
+        if hasattr(self, 'osso') and self.osso:  # Garante que self.osso existe e não está vazio
+            if self.contador_osso >= len(self.osso):
+                self.contador_osso = 0
+            self.image = self.osso[int(self.contador_osso) % len(self.osso)]
 
-        if self.rato.atacou and not self.atirar:
+        # Verifica se deve iniciar um novo ataque
+        if self.rato.atacando and not self.atirar:
             self.atirar = True
+            # Define a posição inicial do osso como a posição atual do rato
             self.rect.center = self.rato.rect.center
             self.x, self.y = self.rect.center
 
-            # PEGA APENAS A POSIÇÃO X DO CANGURU (horizontal)
-            self.alvo_x = self.canguru.rect.centerx
+            # Pega a posição ATUAL do canguru no momento do disparo
+            alvo_x, alvo_y = self.canguru.rect.center
 
-            # Configurações de movimento:
-            self.velocidade_x = 9  # Velocidade horizontal (ajuste)
-            self.velocidade_y = 5 # Velocidade vertical (queda)
+            # --- DEBUG: Imprimir coordenadas no momento do disparo (descomente se precisar) ---
+            # print(f"Disparo iniciado! Rato: ({self.x:.2f}, {self.y:.2f}), Canguru: ({alvo_x}, {alvo_y})")
+            # -----------------------------------------------------------------------------
 
-            # Determina direção horizontal (esquerda/direita)
-            self.direcao_x = 1 if self.alvo_x > self.x else -1
+            # Calcula o vetor de direção do rato para o canguru
+            delta_x = alvo_x - self.x
+            delta_y = alvo_y - self.y
 
-            # Movimento ATUAL (bem simples)
+            # Calcula a distância (magnitude do vetor)
+            # Usamos max(1, ...) para evitar divisão por zero se a distância for muito pequena ou zero
+            distancia = max(1, math.sqrt(delta_x ** 2 + delta_y ** 2))
+
+            # --- AJUSTE PRINCIPAL: Aumentar a velocidade total do osso ---
+            # Experimente valores diferentes aqui se necessário (ex: 15, 20, 25)
+            velocidade_total_osso = 18 # Valor anterior era 8, aumentamos significativamente
+
+
+                # -------------------------------------------------------------
+
+            # Calcula as componentes X e Y da velocidade
+            # Normaliza o vetor (divide pela distância) e multiplica pela velocidade total
+            self.velocidade_x = (delta_x / distancia) * velocidade_total_osso
+            self.velocidade_y = (delta_y / distancia) * velocidade_total_osso
+
+            # --- DEBUG: Imprimir vetor e velocidades calculadas (descomente se precisar) ---
+            # print(f"  Delta: ({delta_x:.2f}, {delta_y:.2f}), Dist: {distancia:.2f}")
+            # print(f"  Velocidade Calculada: ({self.velocidade_x:.2f}, {self.velocidade_y:.2f})")
+            # -----------------------------------------------------------------------------
+
+        # Movimenta o osso se ele foi atirado
         if self.atirar:
-            # Movimento horizontal SEMPRE na direção X original do canguru
-            self.x += self.velocidade_x * self.direcao_x
+            if rato.rect.x - canguru.rect.x <= 200:
+                self.x += self.velocidade_x -5
+                self.y += self.velocidade_y -5
+                self.rect.center = (int(self.x), int(self.y))
 
-            # Queda vertical (Y sempre aumenta)
-            self.y += self.velocidade_y
+            else:
+                # Atualiza a posição X e Y com base nas componentes de velocidade calculadas
+                self.x += self.velocidade_x - 2
+                self.y += self.velocidade_y - 5
+                self.rect.center = (int(self.x), int(self.y))
 
-            self.rect.center = (int(self.x), int(self.y))
+            # --- DEBUG: Imprimir posição atual do osso (descomente se precisar) ---
+            # print(f"  Osso em movimento: ({self.x:.2f}, {self.y:.2f})")
+            # ---------------------------------------------------------------------
 
-        if self.rato.rect.x <= -10:
-            self.atirar = False
-            self.contador_osso = 0
-            self.rect.center = (-100, -100)
+            # Condição de reset (ex: saiu da tela)
+            # Considerar adicionar mais condições (sair pela direita, por cima, por baixo)
+            # Exemplo: if self.rect.right < 0 or self.rect.left > LARGURA_TELA or self.rect.bottom < 0 or self.rect.top > ALTURA_TELA:
+            if self.rect.right < 0:  # Mantendo sua condição original por enquanto
+
+                self.contador_osso = 0  # Reinicia a animação
+                # Reposiciona fora da tela para evitar colisões indesejadas até o próximo tiro
+                self.rect.center = (-100, -100)
+                self.x, self.y = self.rect.center
+                # print("Osso resetado.") # Debug
+            if rato.rect.x <= -10:
+                self.atirar = False
+
+
+
+    def Colisao(self):
+        osso_hitbox = pygame.Rect(self.rect.x + 55, self.rect.y + 70, 40, 30)
+        pygame.draw.rect(tela, (250, 105, 180), osso_hitbox, 2)
+        canguru_hitbox = canguru.Colisao()
+
+        for hitbox in canguru_hitbox:
+            if osso_hitbox.colliderect(hitbox):
+                print("COLIDIU COM O Osso!")
+                if canguru.contador_colisao == 0:
+                    vidas_rosto.dano = True
+                    vidas_numeros.dano = True
+                    canguru.contador_colisao = 1
+
+    def update(self):
+        self.osso_on()
+        self.Colisao()
+class Osso2(pygame.sprite.Sprite):
+    def __init__(self,pontos,rato2,canguru):
+        pygame.sprite.Sprite.__init__(self)
+        self.contador_osso = 0
+        self.leveis = pontos
+        self.rato2 = rato2
+        self.canguru = canguru
+
+        self.atirar = False
+        self.Sprites()
+        self.x = 0
+        self.y = 0
+        self.velocidade = 8
+
+    def Sprites(self):
+        self.osso = []
+        for i in range (6,14):
+            imagem_osso = carroca_rato.subsurface((i * 500, 0), (500, 500))
+            imagem_osso = pygame.transform.scale(imagem_osso, (500/3, 500/3))
+            self.osso.append(imagem_osso)
+        self.image = self.osso[0]
+        self.rect = self.image.get_rect()
+        self.rect.center = (-100, -100)
+
+    def osso_on(self):
+        # Animação do osso (se houver)
+        # Mantém a lógica de animação original
+        self.contador_osso += 0.5
+        if hasattr(self, 'osso') and self.osso:  # Garante que self.osso existe e não está vazio
+            if self.contador_osso >= len(self.osso):
+                self.contador_osso = 0
+            self.image = self.osso[int(self.contador_osso) % len(self.osso)]
+
+        # Verifica se deve iniciar um novo ataque
+        if self.rato2.atacando and not self.atirar:
+            self.atirar = True
+            # Define a posição inicial do osso como a posição atual do rato
+            self.rect.center = self.rato2.rect.center
+            self.x, self.y = self.rect.center
+
+            # Pega a posição ATUAL do canguru no momento do disparo
+            alvo_x, alvo_y = self.canguru.rect.center
+
+            # --- DEBUG: Imprimir coordenadas no momento do disparo (descomente se precisar) ---
+            # print(f"Disparo iniciado! Rato: ({self.x:.2f}, {self.y:.2f}), Canguru: ({alvo_x}, {alvo_y})")
+            # -----------------------------------------------------------------------------
+
+            # Calcula o vetor de direção do rato para o canguru
+            delta_x = alvo_x - self.x
+            delta_y = alvo_y - self.y
+
+            # Calcula a distância (magnitude do vetor)
+            # Usamos max(1, ...) para evitar divisão por zero se a distância for muito pequena ou zero
+            distancia = max(1, math.sqrt(delta_x ** 2 + delta_y ** 2))
+
+            # --- AJUSTE PRINCIPAL: Aumentar a velocidade total do osso ---
+            # Experimente valores diferentes aqui se necessário (ex: 15, 20, 25)
+            velocidade_total_osso = 18 # Valor anterior era 8, aumentamos significativamente
+
+
+                # -------------------------------------------------------------
+
+            # Calcula as componentes X e Y da velocidade
+            # Normaliza o vetor (divide pela distância) e multiplica pela velocidade total
+            self.velocidade_x = (delta_x / distancia) * velocidade_total_osso
+            self.velocidade_y = (delta_y / distancia) * velocidade_total_osso
+
+            # --- DEBUG: Imprimir vetor e velocidades calculadas (descomente se precisar) ---
+            # print(f"  Delta: ({delta_x:.2f}, {delta_y:.2f}), Dist: {distancia:.2f}")
+            # print(f"  Velocidade Calculada: ({self.velocidade_x:.2f}, {self.velocidade_y:.2f})")
+            # -----------------------------------------------------------------------------
+
+        # Movimenta o osso se ele foi atirado
+        if self.atirar:
+            if self.rato2.rect.x - canguru.rect.x <= 200:
+                self.x += self.velocidade_x -5
+                self.y += self.velocidade_y -5
+                self.rect.center = (int(self.x), int(self.y))
+
+            else:
+                # Atualiza a posição X e Y com base nas componentes de velocidade calculadas
+                self.x += self.velocidade_x - 2
+                self.y += self.velocidade_y - 5
+                self.rect.center = (int(self.x), int(self.y))
+
+            # --- DEBUG: Imprimir posição atual do osso (descomente se precisar) ---
+            # print(f"  Osso em movimento: ({self.x:.2f}, {self.y:.2f})")
+            # ---------------------------------------------------------------------
+
+            # Condição de reset (ex: saiu da tela)
+            # Considerar adicionar mais condições (sair pela direita, por cima, por baixo)
+            # Exemplo: if self.rect.right < 0 or self.rect.left > LARGURA_TELA or self.rect.bottom < 0 or self.rect.top > ALTURA_TELA:
+            if self.rect.right < 0:  # Mantendo sua condição original por enquanto
+
+                self.contador_osso = 0  # Reinicia a animação
+                # Reposiciona fora da tela para evitar colisões indesejadas até o próximo tiro
+                self.rect.center = (-100, -100)
+                self.x, self.y = self.rect.center
+                # print("Osso resetado.") # Debug
+            if self.rato2.rect.x <= -10:
+                self.atirar = False
+
+
+
+    def Colisao(self):
+        osso_hitbox = pygame.Rect(self.rect.x + 55, self.rect.y + 70, 40, 30)
+        pygame.draw.rect(tela, (250, 105, 180), osso_hitbox, 2)
+        canguru_hitbox = canguru.Colisao()
+
+        for hitbox in canguru_hitbox:
+            if osso_hitbox.colliderect(hitbox):
+                print("COLIDIU COM O Osso!")
+                if canguru.contador_colisao == 0:
+                    vidas_rosto.dano = True
+                    vidas_numeros.dano = True
+                    canguru.contador_colisao = 1
+
+    def update(self):
+        self.osso_on()
+        self.Colisao()
+class Osso3(pygame.sprite.Sprite):
+    def __init__(self,pontos,rato3,canguru):
+        pygame.sprite.Sprite.__init__(self)
+        self.contador_osso = 0
+        self.leveis = pontos
+        self.rato3 = rato3
+        self.canguru = canguru
+
+        self.atirar = False
+        self.Sprites()
+        self.x = 0
+        self.y = 0
+        self.velocidade = 8
+
+    def Sprites(self):
+        self.osso = []
+        for i in range (6,14):
+            imagem_osso = carroca_rato.subsurface((i * 500, 0), (500, 500))
+            imagem_osso = pygame.transform.scale(imagem_osso, (500/3, 500/3))
+            self.osso.append(imagem_osso)
+        self.image = self.osso[0]
+        self.rect = self.image.get_rect()
+        self.rect.center = (-100, -100)
+
+    def osso_on(self):
+        # Animação do osso (se houver)
+        # Mantém a lógica de animação original
+        self.contador_osso += 0.5
+        if hasattr(self, 'osso') and self.osso:  # Garante que self.osso existe e não está vazio
+            if self.contador_osso >= len(self.osso):
+                self.contador_osso = 0
+            self.image = self.osso[int(self.contador_osso) % len(self.osso)]
+
+        # Verifica se deve iniciar um novo ataque
+        if self.rato3.atacando and not self.atirar:
+            self.atirar = True
+            # Define a posição inicial do osso como a posição atual do rato
+            self.rect.center = self.rato3.rect.center
+            self.x, self.y = self.rect.center
+
+            # Pega a posição ATUAL do canguru no momento do disparo
+            alvo_x, alvo_y = self.canguru.rect.center
+
+            # --- DEBUG: Imprimir coordenadas no momento do disparo (descomente se precisar) ---
+            # print(f"Disparo iniciado! Rato: ({self.x:.2f}, {self.y:.2f}), Canguru: ({alvo_x}, {alvo_y})")
+            # -----------------------------------------------------------------------------
+
+            # Calcula o vetor de direção do rato para o canguru
+            delta_x = alvo_x - self.x
+            delta_y = alvo_y - self.y
+
+            # Calcula a distância (magnitude do vetor)
+            # Usamos max(1, ...) para evitar divisão por zero se a distância for muito pequena ou zero
+            distancia = max(1, math.sqrt(delta_x ** 2 + delta_y ** 2))
+
+            # --- AJUSTE PRINCIPAL: Aumentar a velocidade total do osso ---
+            # Experimente valores diferentes aqui se necessário (ex: 15, 20, 25)
+            self.velocidade_total_osso = 18 # Valor anterior era 8, aumentamos significativamente
+
+
+                # -------------------------------------------------------------
+
+            # Calcula as componentes X e Y da velocidade
+            # Normaliza o vetor (divide pela distância) e multiplica pela velocidade total
+            self.velocidade_x = (delta_x / distancia) * self.velocidade_total_osso
+            self.velocidade_y = (delta_y / distancia) * self.velocidade_total_osso
+
+            # --- DEBUG: Imprimir vetor e velocidades calculadas (descomente se precisar) ---
+            # print(f"  Delta: ({delta_x:.2f}, {delta_y:.2f}), Dist: {distancia:.2f}")
+            # print(f"  Velocidade Calculada: ({self.velocidade_x:.2f}, {self.velocidade_y:.2f})")
+            # -----------------------------------------------------------------------------
+
+        # Movimenta o osso se ele foi atirado
+        if self.atirar:
+            if self.rato3.rect.x - canguru.rect.x <= 200:
+                self.x += self.velocidade_x -5
+                self.y += self.velocidade_y -5
+                self.rect.center = (int(self.x), int(self.y))
+
+            else:
+                # Atualiza a posição X e Y com base nas componentes de velocidade calculadas
+                self.x += self.velocidade_x - 2
+                self.y += self.velocidade_y - 5
+                self.rect.center = (int(self.x), int(self.y))
+
+            # --- DEBUG: Imprimir posição atual do osso (descomente se precisar) ---
+            # print(f"  Osso em movimento: ({self.x:.2f}, {self.y:.2f})")
+            # ---------------------------------------------------------------------
+
+            # Condição de reset (ex: saiu da tela)
+            # Considerar adicionar mais condições (sair pela direita, por cima, por baixo)
+            # Exemplo: if self.rect.right < 0 or self.rect.left > LARGURA_TELA or self.rect.bottom < 0 or self.rect.top > ALTURA_TELA:
+            if self.rect.right < 0:  # Mantendo sua condição original por enquanto
+
+                self.contador_osso = 0  # Reinicia a animação
+                # Reposiciona fora da tela para evitar colisões indesejadas até o próximo tiro
+                self.rect.center = (-100, -100)
+                self.x, self.y = self.rect.center
+                # print("Osso resetado.") # Debug
+            if self.rato3.rect.x <= -10:
+                self.atirar = False
+
+
+
+    def Colisao(self):
+        osso_hitbox = pygame.Rect(self.rect.x + 55, self.rect.y + 70, 40, 30)
+        pygame.draw.rect(tela, (250, 105, 180), osso_hitbox, 2)
+        canguru_hitbox = canguru.Colisao()
+
+        for hitbox in canguru_hitbox:
+            if osso_hitbox.colliderect(hitbox):
+                print("COLIDIU COM O Osso!")
+                if canguru.contador_colisao == 0:
+                    vidas_rosto.dano = True
+                    vidas_numeros.dano = True
+                    canguru.contador_colisao = 1
+
+    def update(self):
+        self.osso_on()
+        self.Colisao()
+class Osso4(pygame.sprite.Sprite):
+    def __init__(self,pontos,rato4,canguru):
+        pygame.sprite.Sprite.__init__(self)
+        self.contador_osso = 0
+        self.leveis = pontos
+        self.rato4 = rato4
+        self.canguru = canguru
+
+        self.atirar = False
+        self.Sprites()
+        self.x = 0
+        self.y = 0
+        self.velocidade = 8
+
+    def Sprites(self):
+        self.osso = []
+        for i in range (6,14):
+            imagem_osso = carroca_rato.subsurface((i * 500, 0), (500, 500))
+            imagem_osso = pygame.transform.scale(imagem_osso, (500/3, 500/3))
+            self.osso.append(imagem_osso)
+        self.image = self.osso[0]
+        self.rect = self.image.get_rect()
+        self.rect.center = (-100, -100)
+
+    def osso_on(self):
+        # Animação do osso (se houver)
+        # Mantém a lógica de animação original
+        self.contador_osso += 0.5
+        if hasattr(self, 'osso') and self.osso:  # Garante que self.osso existe e não está vazio
+            if self.contador_osso >= len(self.osso):
+                self.contador_osso = 0
+            self.image = self.osso[int(self.contador_osso) % len(self.osso)]
+
+        # Verifica se deve iniciar um novo ataque
+        if self.rato4.atacando and not self.atirar:
+            self.atirar = True
+            # Define a posição inicial do osso como a posição atual do rato
+            self.rect.center = self.rato4.rect.center
+            self.x, self.y = self.rect.center
+
+            # Pega a posição ATUAL do canguru no momento do disparo
+            alvo_x, alvo_y = self.canguru.rect.center
+
+            # --- DEBUG: Imprimir coordenadas no momento do disparo (descomente se precisar) ---
+            # print(f"Disparo iniciado! Rato: ({self.x:.2f}, {self.y:.2f}), Canguru: ({alvo_x}, {alvo_y})")
+            # -----------------------------------------------------------------------------
+
+            # Calcula o vetor de direção do rato para o canguru
+            delta_x = alvo_x - self.x
+            delta_y = alvo_y - self.y
+
+            # Calcula a distância (magnitude do vetor)
+            # Usamos max(1, ...) para evitar divisão por zero se a distância for muito pequena ou zero
+            distancia = max(1, math.sqrt(delta_x ** 2 + delta_y ** 2))
+
+            # --- AJUSTE PRINCIPAL: Aumentar a velocidade total do osso ---
+            # Experimente valores diferentes aqui se necessário (ex: 15, 20, 25)
+            velocidade_total_osso = 18 # Valor anterior era 8, aumentamos significativamente
+
+
+                # -------------------------------------------------------------
+
+            # Calcula as componentes X e Y da velocidade
+            # Normaliza o vetor (divide pela distância) e multiplica pela velocidade total
+            self.velocidade_x = (delta_x / distancia) * velocidade_total_osso
+            self.velocidade_y = (delta_y / distancia) * velocidade_total_osso
+
+            # --- DEBUG: Imprimir vetor e velocidades calculadas (descomente se precisar) ---
+            # print(f"  Delta: ({delta_x:.2f}, {delta_y:.2f}), Dist: {distancia:.2f}")
+            # print(f"  Velocidade Calculada: ({self.velocidade_x:.2f}, {self.velocidade_y:.2f})")
+            # -----------------------------------------------------------------------------
+
+        # Movimenta o osso se ele foi atirado
+        if self.atirar:
+            if self.rato4.rect.x - canguru.rect.x <= 200:
+                self.x += self.velocidade_x -5
+                self.y += self.velocidade_y -5
+                self.rect.center = (int(self.x), int(self.y))
+
+            else:
+                # Atualiza a posição X e Y com base nas componentes de velocidade calculadas
+                self.x += self.velocidade_x - 2
+                self.y += self.velocidade_y - 5
+                self.rect.center = (int(self.x), int(self.y))
+
+            # --- DEBUG: Imprimir posição atual do osso (descomente se precisar) ---
+            # print(f"  Osso em movimento: ({self.x:.2f}, {self.y:.2f})")
+            # ---------------------------------------------------------------------
+
+            # Condição de reset (ex: saiu da tela)
+            # Considerar adicionar mais condições (sair pela direita, por cima, por baixo)
+            # Exemplo: if self.rect.right < 0 or self.rect.left > LARGURA_TELA or self.rect.bottom < 0 or self.rect.top > ALTURA_TELA:
+            if self.rect.right < 0:  # Mantendo sua condição original por enquanto
+
+                self.contador_osso = 0  # Reinicia a animação
+                # Reposiciona fora da tela para evitar colisões indesejadas até o próximo tiro
+                self.rect.center = (-100, -100)
+                self.x, self.y = self.rect.center
+                # print("Osso resetado.") # Debug
+            if self.rato4.rect.x <= -10:
+                self.atirar = False
+
+
+
+    def Colisao(self):
+        osso_hitbox = pygame.Rect(self.rect.x + 55, self.rect.y + 70, 40, 30)
+        pygame.draw.rect(tela, (250, 105, 180), osso_hitbox, 2)
+        canguru_hitbox = canguru.Colisao()
+
+        for hitbox in canguru_hitbox:
+            if osso_hitbox.colliderect(hitbox):
+                print("COLIDIU COM O Osso!")
+                if canguru.contador_colisao == 0:
+                    vidas_rosto.dano = True
+                    vidas_numeros.dano = True
+                    canguru.contador_colisao = 1
+
+    def update(self):
+        self.osso_on()
+        self.Colisao()
+class Osso5(pygame.sprite.Sprite):
+    def __init__(self,pontos,rato5,canguru):
+        pygame.sprite.Sprite.__init__(self)
+        self.contador_osso = 0
+        self.leveis = pontos
+        self.rato5 = rato5
+        self.canguru = canguru
+
+        self.atirar = False
+        self.Sprites()
+        self.x = 0
+        self.y = 0
+        self.velocidade = 8
+
+    def Sprites(self):
+        self.osso = []
+        for i in range (6,14):
+            imagem_osso = carroca_rato.subsurface((i * 500, 0), (500, 500))
+            imagem_osso = pygame.transform.scale(imagem_osso, (500/3, 500/3))
+            self.osso.append(imagem_osso)
+        self.image = self.osso[0]
+        self.rect = self.image.get_rect()
+        self.rect.center = (-100, -100)
+
+    def osso_on(self):
+        # Animação do osso (se houver)
+        # Mantém a lógica de animação original
+        self.contador_osso += 0.5
+        if hasattr(self, 'osso') and self.osso:  # Garante que self.osso existe e não está vazio
+            if self.contador_osso >= len(self.osso):
+                self.contador_osso = 0
+            self.image = self.osso[int(self.contador_osso) % len(self.osso)]
+
+        # Verifica se deve iniciar um novo ataque
+        if self.rato5.atacando and not self.atirar:
+            self.atirar = True
+            # Define a posição inicial do osso como a posição atual do rato
+            self.rect.center = self.rato5.rect.center
+            self.x, self.y = self.rect.center
+
+            # Pega a posição ATUAL do canguru no momento do disparo
+            alvo_x, alvo_y = self.canguru.rect.center
+
+            # --- DEBUG: Imprimir coordenadas no momento do disparo (descomente se precisar) ---
+            # print(f"Disparo iniciado! Rato: ({self.x:.2f}, {self.y:.2f}), Canguru: ({alvo_x}, {alvo_y})")
+            # -----------------------------------------------------------------------------
+
+            # Calcula o vetor de direção do rato para o canguru
+            delta_x = alvo_x - self.x
+            delta_y = alvo_y - self.y
+
+            # Calcula a distância (magnitude do vetor)
+            # Usamos max(1, ...) para evitar divisão por zero se a distância for muito pequena ou zero
+            distancia = max(1, math.sqrt(delta_x ** 2 + delta_y ** 2))
+
+            # --- AJUSTE PRINCIPAL: Aumentar a velocidade total do osso ---
+            # Experimente valores diferentes aqui se necessário (ex: 15, 20, 25)
+            velocidade_total_osso = 18 # Valor anterior era 8, aumentamos significativamente
+
+
+                # -------------------------------------------------------------
+
+            # Calcula as componentes X e Y da velocidade
+            # Normaliza o vetor (divide pela distância) e multiplica pela velocidade total
+            self.velocidade_x = (delta_x / distancia) * velocidade_total_osso
+            self.velocidade_y = (delta_y / distancia) * velocidade_total_osso
+
+            # --- DEBUG: Imprimir vetor e velocidades calculadas (descomente se precisar) ---
+            # print(f"  Delta: ({delta_x:.2f}, {delta_y:.2f}), Dist: {distancia:.2f}")
+            # print(f"  Velocidade Calculada: ({self.velocidade_x:.2f}, {self.velocidade_y:.2f})")
+            # -----------------------------------------------------------------------------
+
+        # Movimenta o osso se ele foi atirado
+        if self.atirar:
+            if self.rato5.rect.x - canguru.rect.x <= 200:
+                self.x += self.velocidade_x -5
+                self.y += self.velocidade_y -5
+                self.rect.center = (int(self.x), int(self.y))
+
+            else:
+                # Atualiza a posição X e Y com base nas componentes de velocidade calculadas
+                self.x += self.velocidade_x - 2
+                self.y += self.velocidade_y - 5
+                self.rect.center = (int(self.x), int(self.y))
+
+            # --- DEBUG: Imprimir posição atual do osso (descomente se precisar) ---
+            # print(f"  Osso em movimento: ({self.x:.2f}, {self.y:.2f})")
+            # ---------------------------------------------------------------------
+
+            # Condição de reset (ex: saiu da tela)
+            # Considerar adicionar mais condições (sair pela direita, por cima, por baixo)
+            # Exemplo: if self.rect.right < 0 or self.rect.left > LARGURA_TELA or self.rect.bottom < 0 or self.rect.top > ALTURA_TELA:
+            if self.rect.right < 0:  # Mantendo sua condição original por enquanto
+
+                self.contador_osso = 0  # Reinicia a animação
+                # Reposiciona fora da tela para evitar colisões indesejadas até o próximo tiro
+                self.rect.center = (-100, -100)
+                self.x, self.y = self.rect.center
+                # print("Osso resetado.") # Debug
+            if self.rato5.rect.x <= -10:
+                self.atirar = False
+
+
+
+    def Colisao(self):
+        osso_hitbox = pygame.Rect(self.rect.x + 55, self.rect.y + 70, 40, 30)
+        pygame.draw.rect(tela, (250, 105, 180), osso_hitbox, 2)
+        canguru_hitbox = canguru.Colisao()
+
+        for hitbox in canguru_hitbox:
+            if osso_hitbox.colliderect(hitbox):
+                print("COLIDIU COM O Osso!")
+                if canguru.contador_colisao == 0:
+                    vidas_rosto.dano = True
+                    vidas_numeros.dano = True
+                    canguru.contador_colisao = 1
+
+    def update(self):
+        self.osso_on()
+        self.Colisao()
+class Osso6(pygame.sprite.Sprite):
+    def __init__(self,pontos,rato6,canguru):
+        pygame.sprite.Sprite.__init__(self)
+        self.contador_osso = 0
+        self.leveis = pontos
+        self.rato6 = rato6
+        self.canguru = canguru
+
+        self.atirar = False
+        self.Sprites()
+        self.x = 0
+        self.y = 0
+        self.velocidade = 8
+
+    def Sprites(self):
+        self.osso = []
+        for i in range (6,14):
+            imagem_osso = carroca_rato.subsurface((i * 500, 0), (500, 500))
+            imagem_osso = pygame.transform.scale(imagem_osso, (500/3, 500/3))
+            self.osso.append(imagem_osso)
+        self.image = self.osso[0]
+        self.rect = self.image.get_rect()
+        self.rect.center = (-100, -100)
+
+    def osso_on(self):
+        # Animação do osso (se houver)
+        # Mantém a lógica de animação original
+        self.contador_osso += 0.5
+        if hasattr(self, 'osso') and self.osso:  # Garante que self.osso existe e não está vazio
+            if self.contador_osso >= len(self.osso):
+                self.contador_osso = 0
+            self.image = self.osso[int(self.contador_osso) % len(self.osso)]
+
+        # Verifica se deve iniciar um novo ataque
+        if self.rato6.atacando and not self.atirar:
+            self.atirar = True
+            # Define a posição inicial do osso como a posição atual do rato
+            self.rect.center = self.rato6.rect.center
+            self.x, self.y = self.rect.center
+
+            # Pega a posição ATUAL do canguru no momento do disparo
+            alvo_x, alvo_y = self.canguru.rect.center
+
+            # --- DEBUG: Imprimir coordenadas no momento do disparo (descomente se precisar) ---
+            # print(f"Disparo iniciado! Rato: ({self.x:.2f}, {self.y:.2f}), Canguru: ({alvo_x}, {alvo_y})")
+            # -----------------------------------------------------------------------------
+
+            # Calcula o vetor de direção do rato para o canguru
+            delta_x = alvo_x - self.x
+            delta_y = alvo_y - self.y
+
+            # Calcula a distância (magnitude do vetor)
+            # Usamos max(1, ...) para evitar divisão por zero se a distância for muito pequena ou zero
+            distancia = max(1, math.sqrt(delta_x ** 2 + delta_y ** 2))
+
+            # --- AJUSTE PRINCIPAL: Aumentar a velocidade total do osso ---
+            # Experimente valores diferentes aqui se necessário (ex: 15, 20, 25)
+            velocidade_total_osso = 18 # Valor anterior era 8, aumentamos significativamente
+
+
+                # -------------------------------------------------------------
+
+            # Calcula as componentes X e Y da velocidade
+            # Normaliza o vetor (divide pela distância) e multiplica pela velocidade total
+            self.velocidade_x = (delta_x / distancia) * velocidade_total_osso
+            self.velocidade_y = (delta_y / distancia) * velocidade_total_osso
+
+            # --- DEBUG: Imprimir vetor e velocidades calculadas (descomente se precisar) ---
+            # print(f"  Delta: ({delta_x:.2f}, {delta_y:.2f}), Dist: {distancia:.2f}")
+            # print(f"  Velocidade Calculada: ({self.velocidade_x:.2f}, {self.velocidade_y:.2f})")
+            # -----------------------------------------------------------------------------
+
+        # Movimenta o osso se ele foi atirado
+        if self.atirar:
+            if self.rato6.rect.x - canguru.rect.x <= 200:
+                self.x += self.velocidade_x -5
+                self.y += self.velocidade_y -5
+                self.rect.center = (int(self.x), int(self.y))
+
+            else:
+                # Atualiza a posição X e Y com base nas componentes de velocidade calculadas
+                self.x += self.velocidade_x - 2
+                self.y += self.velocidade_y - 5
+                self.rect.center = (int(self.x), int(self.y))
+
+            # --- DEBUG: Imprimir posição atual do osso (descomente se precisar) ---
+            # print(f"  Osso em movimento: ({self.x:.2f}, {self.y:.2f})")
+            # ---------------------------------------------------------------------
+
+            # Condição de reset (ex: saiu da tela)
+            # Considerar adicionar mais condições (sair pela direita, por cima, por baixo)
+            # Exemplo: if self.rect.right < 0 or self.rect.left > LARGURA_TELA or self.rect.bottom < 0 or self.rect.top > ALTURA_TELA:
+            if self.rect.right < 0:  # Mantendo sua condição original por enquanto
+
+                self.contador_osso = 0  # Reinicia a animação
+                # Reposiciona fora da tela para evitar colisões indesejadas até o próximo tiro
+                self.rect.center = (-100, -100)
+                self.x, self.y = self.rect.center
+                # print("Osso resetado.") # Debug
+            if self.rato6.rect.x <= -10:
+                self.atirar = False
+
+
 
     def Colisao(self):
         osso_hitbox = pygame.Rect(self.rect.x + 55, self.rect.y + 70, 40, 30)
@@ -5081,7 +6115,7 @@ class Gameover_bumerangue (pygame.sprite.Sprite):
 #classes
 pontos = Leveis()
 
-#-------------Peronsagens----------------------#
+#-------------Peronsagens-----------------#
 canguru = Canguru()
 vidas_rosto = Vidas_rosto()
 vidas_numeros = Vidas_numeros()
@@ -5089,16 +6123,29 @@ dano = Dano_canguru()
 bumerangue = Bumerangue(canguru)
 colisao = Colisao()
 canguru.bumerangue = bumerangue
-#----------Inimigos----------#
+#-----------------Itens-------------------#
+item_vida = Item_vida()
+#----------------Inimigos----------------#
+#ratos
 rato = Rato(pontos)
+rato2 = Rato2(pontos)
+rato3 = Rato3(pontos)
+rato4 = Rato4(pontos)
+rato5 = Rato5(pontos)
+rato6 = Rato6(pontos)
+#--
 osso = Osso(pontos,rato,canguru)
+osso2 = Osso2(pontos,rato2,canguru)
+osso3 = Osso3(pontos,rato3,canguru)
+osso4 = Osso4(pontos,rato4,canguru)
+osso5 = Osso5(pontos,rato5,canguru)
+osso6 = Osso5(pontos,rato6,canguru)
 #lagartos
 lagarto = Lagarto(pontos,canguru,bumerangue)
 lagarto2 = Lagarto2(pontos,canguru,bumerangue)
 lagarto3 = Lagarto3(pontos,canguru,bumerangue)
 lagarto4 = Lagarto4(pontos,canguru,bumerangue)
 lagarto5 = Lagarto5(pontos,canguru,bumerangue)
-
 #dingos
 dingo = Dingo(pontos,bumerangue,canguru.bumerangue)
 dingo2 = Dingo2(pontos,bumerangue,canguru.bumerangue)
@@ -5137,8 +6184,10 @@ chaodia =Chaodia()
 chaonoite = Chaonoite()
 montanhas = Montanhas()
 montanhas2=Montanhas2()
-#---------junção classes--------------#
+#-------------Gerenciador------------#
 gerenciador = Gerenciador()
+#---------junção classes--------------#
+
 canguru.vidas_numeros = vidas_numeros
 montanhas.montanha = montanha
 montanhas2.montanhas = montanhas
@@ -5155,11 +6204,13 @@ game.add(noite,lua,dia,sol, layer=0)
 game.add(layer=1)
 game.add(nuvem, nuvem2, nuvem3, nuvem4, nuvem5,chaonoite,chaodia, layer=2)
 game.add(montanha,montanhas,montanhas2,tufo,grama,grama2,grama3, layer=3)
-game.add(elementos, elementos2, elementos3,chao,chao2,chao3,tufo,canguru,bumerangue,layer=4)
+game.add(elementos, elementos2, elementos3,chao,chao2,chao3,tufo,layer=4)
+game.add(item_vida,canguru,bumerangue,layer = 4.5)
 game.add(lagarto,lagarto2,lagarto3,lagarto4,lagarto5, layer=6)
-game.add(rato, layer=7)
-game.add( dingo,dingo2,dingo3,dingo4,dingo5,dingo6,layer=8)
-game.add(osso,vidas_rosto,vidas_numeros,layer=9)
+game.add( dingo,dingo2,dingo3,dingo4,dingo5,dingo6,layer=7)
+game.add(rato,rato2,rato3,rato4,rato5,rato6, layer=8)
+game.add(osso,osso2,osso3,osso4,osso5,osso6,layer=9)
+game.add(vidas_rosto,vidas_numeros,layer=10)
 game.add(layer=canguru.get_layer())
 game.add(layer=dingo.get_layer())
 game.add(layer=dingo2.get_layer())
