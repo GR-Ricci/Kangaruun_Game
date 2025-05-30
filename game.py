@@ -1,6 +1,6 @@
 from sys import exit
 from classes import * #locals ja esta vindo
-
+import sys
 def Reset():
     pontos.__init__()
 
@@ -95,9 +95,35 @@ while True:
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
-            exit()
+            sys.exit()
 
         if event.type == KEYDOWN:
+            if menu.menu_on:
+                if event.key == K_DOWN and cursor.cima:
+                    cursor.cima = False
+                    cursor.meio = True
+                    cursor.baixo = False
+
+                elif event.key == K_DOWN and cursor.meio :
+                    cursor.cima = False
+                    cursor.meio = False
+                    cursor.baixo = True
+
+                elif event.key == K_UP and cursor.baixo:
+                    cursor.cima = False
+                    cursor.meio = True
+                    cursor.baixo = False
+
+                elif event.key == K_UP and cursor.meio:
+                    cursor.cima = True
+                    cursor.meio = False
+                    cursor.baixo = False
+                if event.key == K_RETURN and cursor.cima:
+                    menu.menu_on = False
+                if event.key == K_RETURN and cursor.baixo:
+                    pygame.quit()
+                    sys.exit()
+
             if not canguru.morreu:
                 if event.key == K_RIGHT:
                     canguru.avanco = True
@@ -136,40 +162,46 @@ while True:
 
 
     #pontos.update()
+    if menu.menu_on:
+        menu.update()
+        kangaruun.update()
+        cursor.update()
+        efeitos_menu.update()
+        play.update()
+        exit.update()
+        settings.update()
+    else:
+        game.update()
+        game.draw(tela)
 
-    game.update()
-    game.draw(tela)
-    if gameover_continue.iniciar_continue:
-        Reset()
-    if gameover_quit.iniciar_quit:
-        pygame.quit()
-        exit()
-
-    gerenciador.update()
-
-    item_vida.Colisao()
-    #bumerangue.Colisao()
-    #dingo.Colisao()
-    #dingo2.Colisao()
-    #dingo3.Colisao()
-    #dingo4.Colisao()
-    #dingo5.Colisao()
-    #dingo6.Colisao()
-
-    #lagarto.Colisao()
-    #osso.Colisao()
-    #osso3.Colisao()
-
-    #rato.colisao()
-    #rato3.colisao()
-    #canguru.Colisao()
-    colisao.update()
-    dano.update()
+        if gameover_continue.iniciar_continue:
+            Reset()
+        if gameover_quit.iniciar_quit:
+            pygame.quit()
+            sys.exit()
 
 
-    gameover.update()
-    gameover_continue.update()
-    gameover_quit.update()
-    gameover_bumerangue.update()
+        gerenciador.update()
+        colisao.update()
+        dano.update()
+        gameover.update()
+        gameover_continue.update()
+        gameover_quit.update()
+        gameover_bumerangue.update()
+
+        #item_vida.Colisao()
+        #bumerangue.Colisao()
+        #dingo.Colisao()
+        #dingo2.Colisao()
+        #dingo3.Colisao()
+        #dingo4.Colisao()
+        #dingo5.Colisao()
+        #dingo6.Colisao()
+        #lagarto.Colisao()
+        #osso.Colisao()
+        #osso3.Colisao()
+        #rato.colisao()
+        #rato3.colisao()
+        #canguru.Colisao()
 
     pygame.display.flip()

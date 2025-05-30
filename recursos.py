@@ -45,3 +45,4 @@ carroca_gameover_quit = pygame.image.load(os.path.join(loja_menu,'quit.png')).co
 carroca_gameover_quit_quebrado = pygame.image.load(os.path.join(loja_menu,'quit_quebrado.png')).convert_alpha()
 carroca_gameover_continue_quebrado = pygame.image.load(os.path.join(loja_menu,'continue_quebrado.png')).convert_alpha()
 carroca_vida = pygame.image.load(os.path.join(loja_item,'vida.png')).convert_alpha()
+carroca_menu_efeitos = pygame.image.load(os.path.join(loja_menu,'efeitos.png')).convert_alpha()

@@ -6,6 +6,126 @@ import math
 from recursos import*
 from pygame.locals import *
 
+class Menu(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.menu_on = True
+        self.image = pygame.image.load('elementos/menus/menu2.png')
+        self.image = pygame.transform.scale (self.image, (640,480))
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (0,0)
+    def update(self):
+        if self.menu_on:
+            tela.blit(self.image, self.rect)
+
+class Kangaruun(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load('elementos/menus/kangaruun2.png')
+        self.image = pygame.transform.scale (self.image, (1024/3,1024/3))
+        self.rect = self.image.get_rect()
+        self.rect.center = (425,40)
+    def update(self):
+        tela.blit(self.image, self.rect)
+
+class Play(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load('elementos/menus/play.png')
+        self.image = pygame.transform.scale (self.image, (1024/3.3 ,1024/3.3))
+        self.rect = self.image.get_rect()
+        self.rect.center = (428,100)
+    def update(self):
+        tela.blit(self.image, self.rect)
+
+class Settings(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load('elementos/menus/settings.png')
+        self.image = pygame.transform.scale (self.image, (1024/3.2, 1024/3.2))
+        self.rect = self.image.get_rect()
+        self.rect.center = (427,170)
+    def update(self):
+        tela.blit(self.image, self.rect)
+
+class Exit(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load('elementos/menus/exit.png')
+        self.image = pygame.transform.scale (self.image, (1024/3.2,1024/3.2))
+        self.rect = self.image.get_rect()
+        self.rect.center = (427,170)
+    def update(self):
+        tela.blit(self.image, self.rect)
+
+class Cursor(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.cima = True
+        self.meio = False
+        self.baixo = False
+
+
+        self.image = pygame.image.load('elementos/menus/cursor_play.png')
+        self.image = pygame.transform.scale (self.image, (653/3.2,433/3.2))
+        self.rect = self.image.get_rect()
+        self.rect.center = (-100,-100)
+
+    def update(self):
+        tela.blit(self.image, self.rect)
+        if self.cima:
+            self.image = pygame.image.load('elementos/menus/cursor_play.png')
+            self.image = pygame.transform.scale (self.image, (653/4.5,433/4.5))
+            self.rect = self.image.get_rect()
+            self.rect.center = (570,120)
+        if self.meio:
+            self.image = pygame.image.load('elementos/menus/cursor_settings.png')
+            self.image = pygame.transform.scale (self.image, (653/4.5,433/4.5))
+            self.rect = self.image.get_rect()
+            self.rect.center = (570,190)
+        if self.baixo:
+            self.image = pygame.image.load('elementos/menus/cursor_exit.png')
+            self.image = pygame.transform.scale(self.image, (653 / 4.6, 433 / 4.6))
+            self.rect = self.image.get_rect()
+            self.rect.center = (545, 245)
+
+class Efeito_menu(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.contador_efeitos =0
+        self.efeitos = []
+
+        for i in range(4):
+
+            imagens_efeitos = carroca_menu_efeitos.subsurface((i*1535,0), (1536,1024))
+            self.efeitos.append(imagens_efeitos)
+            self.image = self.efeitos[0]
+            self.rect = self.image.get_rect()
+            self.rect.center = (-100,-100)
+
+    def update(self):
+        tela.blit(self.image, self.rect)
+        self.image = self.efeitos[int(self.contador_efeitos)]
+        self.contador_efeitos += 0.15
+        if self.contador_efeitos >= len(self.efeitos):
+            self.contador_efeitos = 0
+
+        if cursor.cima:
+            self.image = pygame.transform.scale (self.image, (1536/2.4,1024/3))
+            self.rect = self.image.get_rect()
+            self.rect.center = (435,170)
+
+        if cursor.meio:
+            self.image = pygame.transform.scale(self.image, (1536 / 2.4, 1024 / 3.2))
+            self.rect = self.image.get_rect()
+            self.rect.center = (435, 235)
+
+        if cursor.baixo:
+            self.image = pygame.transform.scale(self.image, (1536 / 3, 1024 / 3.5))
+            self.rect = self.image.get_rect()
+            self.rect.center = (435, 294)
+
+
 class Leveis():
 
     def __init__(self):
@@ -172,7 +292,7 @@ class Canguru(pygame.sprite.Sprite):
 
     def get_layer(self):
         # Define a camada de desenho com base no Y
-        return 9 if self.baixo else 4.1
+        return 9 if self.baixo else 4
 
     def Sprites(self):
 
@@ -409,10 +529,7 @@ class Canguru(pygame.sprite.Sprite):
             if not self.animar:
                 self.atacando = True
 
-        grupos = self.groups()
-        if grupos:
-            grupo = grupos[0]
-            grupo.change_layer(self, self.get_layer())
+
 
     def Colisao(self):
         if not self.agachado and not self.queda and not self.queda_ar:
@@ -509,6 +626,11 @@ class Canguru(pygame.sprite.Sprite):
                 if self.contador_colisao >= 90:
                     self.image.set_alpha(255)
                     self.contador_colisao = 0
+                    
+        grupos = self.groups()
+        if grupos:
+            grupo = grupos[0]
+            grupo.change_layer(self, self.get_layer())
 
             self.Colisao()
 class Vidas_numeros(pygame.sprite.Sprite):
@@ -730,7 +852,7 @@ class Item_vida(pygame.sprite.Sprite):
 
         if self.spawn == False:
             self.liberar +=1
-            if self.liberar >= 4000:
+            if self.liberar >= 3000:
                 self.sorteio = choice([1, 2])
                 if self.sorteio == 1:
                     self.y = randint(0, 370)  # 410
@@ -6120,6 +6242,14 @@ class Gameover_bumerangue (pygame.sprite.Sprite):
 
 
 #classes
+menu = Menu()
+kangaruun = Kangaruun()
+play = Play()
+exit = Exit()
+settings = Settings()
+cursor = Cursor()
+efeitos_menu = Efeito_menu()
+
 pontos = Leveis()
 
 #-------------Peronsagens-----------------#
