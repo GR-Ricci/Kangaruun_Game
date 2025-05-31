@@ -2,7 +2,7 @@ from sys import exit
 from classes import * #locals ja esta vindo
 import sys
 def Reset():
-    pontos.__init__()
+    leveis.__init__()
 
     canguru.__init__()
     vidas_rosto.__init__()
@@ -15,32 +15,32 @@ def Reset():
 
     item_vida.__init__()
 
-    rato.__init__(pontos)
-    rato2.__init__(pontos)
-    rato3.__init__(pontos)
-    rato4.__init__(pontos)
-    rato5.__init__(pontos)
-    rato6.__init__(pontos)
+    rato.__init__()
+    rato2.__init__()
+    rato3.__init__()
+    rato4.__init__()
+    rato5.__init__()
+    rato6.__init__()
 
-    osso.__init__(pontos, rato, canguru)
-    osso2.__init__(pontos, rato2, canguru)
-    osso3.__init__(pontos, rato3, canguru)
-    osso4.__init__(pontos, rato4, canguru)
-    osso5.__init__(pontos, rato5, canguru)
-    osso6.__init__(pontos, rato6, canguru)
+    osso.__init__( rato, canguru)
+    osso2.__init__( rato2, canguru)
+    osso3.__init__( rato3, canguru)
+    osso4.__init__( rato4, canguru)
+    osso5.__init__( rato5, canguru)
+    osso6.__init__( rato6, canguru)
 
-    lagarto.__init__(pontos, canguru, bumerangue)
-    lagarto2.__init__(pontos, canguru, bumerangue)
-    lagarto3.__init__(pontos, canguru, bumerangue)
-    lagarto4.__init__(pontos, canguru, bumerangue)
-    lagarto5.__init__(pontos, canguru, bumerangue)
+    lagarto.__init__( canguru, bumerangue)
+    lagarto2.__init__( canguru, bumerangue)
+    lagarto3.__init__( canguru, bumerangue)
+    lagarto4.__init__( canguru, bumerangue)
+    lagarto5.__init__( canguru, bumerangue)
 
-    dingo.__init__(pontos, bumerangue, canguru.bumerangue)
-    dingo2.__init__(pontos, bumerangue, canguru.bumerangue)
-    dingo3.__init__(pontos, bumerangue, canguru.bumerangue)
-    dingo4.__init__(pontos, bumerangue, canguru.bumerangue)
-    dingo5.__init__(pontos, bumerangue, canguru.bumerangue)
-    dingo6.__init__(pontos, bumerangue, canguru.bumerangue)
+    dingo.__init__( bumerangue, canguru.bumerangue)
+    dingo2.__init__( bumerangue, canguru.bumerangue)
+    dingo3.__init__( bumerangue, canguru.bumerangue)
+    dingo4.__init__( bumerangue, canguru.bumerangue)
+    dingo5.__init__( bumerangue, canguru.bumerangue)
+    dingo6.__init__( bumerangue, canguru.bumerangue)
 
     gameover.__init__()
     gameover_continue.__init__()
@@ -55,7 +55,7 @@ def Reset():
     nuvem3.__init__()
     nuvem4.__init__()
     nuvem5.__init__()
-    fase.__init__(pontos)
+    fase.__init__()
     chao.__init__()
     chao2.__init__()
     chao3.__init__()
@@ -161,6 +161,7 @@ while True:
                 canguru.agachado = pygame.key.get_pressed()[K_DOWN]
 
 
+
     #pontos.update()
     if menu.menu_on:
         menu.update()
@@ -188,6 +189,7 @@ while True:
         gameover_continue.update()
         gameover_quit.update()
         gameover_bumerangue.update()
+        leveis.update()
 
         #item_vida.Colisao()
         #bumerangue.Colisao()
