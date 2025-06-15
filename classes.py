@@ -127,7 +127,7 @@ class Gameover(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.x = 320
-        self.y = 170
+        self.y = 190
         self.image = carroca_gameover
         self.image = pygame.transform.scale(self.image, (1024 /4, 1024/4))
         self.rect = self.image.get_rect()
@@ -144,7 +144,7 @@ class Gameover_continue (pygame.sprite.Sprite):
         self.iniciar_continue = False
 
         self.x = 320
-        self.y = 180
+        self.y = 200
         self.image = pygame.transform.scale(carroca_gameover_continue, (1024 // 4, 1024 // 4))
         self.rect = self.image.get_rect(center=(self.x, self.y))
 
@@ -163,7 +163,7 @@ class Gameover_continue (pygame.sprite.Sprite):
 
         if self.continue_selecionado and not self.oscilando:
             self.image = pygame.transform.scale(carroca_gameover_continue_quebrado, (1024 // 3.7, 1024 // 3.7))
-            self.y = 178
+            self.y = 198
             self.rect = self.image.get_rect(center=(self.x, self.y))
             self.velocidade = 25
             self.oscilando = True
@@ -194,7 +194,7 @@ class Gameover_quit (pygame.sprite.Sprite):
         self.iniciar_quit = False
 
         self.x = 320
-        self.y = 175
+        self.y = 195
         self.image = pygame.transform.scale(carroca_gameover_quit, (1024 // 4, 1024 // 4))
         self.rect = self.image.get_rect(center=(self.x, self.y))
 
@@ -213,7 +213,7 @@ class Gameover_quit (pygame.sprite.Sprite):
 
         if self.quit_selecionado and not self.oscilando:
             self.image = pygame.transform.scale(carroca_gameover_quit_quebrado, (1024 // 3.7, 1024 // 3.7))
-            self.y = 170
+            self.y = 190
             self.rect = self.image.get_rect(center=(self.x, self.y))
             # Quando recebe o impacto
             self.velocidade = 25  # força do impacto
@@ -255,7 +255,7 @@ class Gameover_bumerangue (pygame.sprite.Sprite):
 
 
         self.x = 160
-        self.y = 207 #257
+        self.y = 227
         self.bumerangue =[]
 
         for i in range(7):
@@ -272,7 +272,7 @@ class Gameover_bumerangue (pygame.sprite.Sprite):
             if self.contador_bumerangue_gameover >= 60:
 
                 if self.bumerangue_desce:
-                    self.y = 257
+                    self.y = 277
                     if not self.iniciou_descida:
                         self.contador_bumerangue = len(self.bumerangue) - 1  # começa no frame 6
                         self.iniciou_descida = True  # evita resetar
@@ -285,7 +285,7 @@ class Gameover_bumerangue (pygame.sprite.Sprite):
 
 
                 if self.bumerangue_sobe:
-                    self.y = 207
+                    self.y = 227
                     self.contador_bumerangue += 0.3
 
                     if self.contador_bumerangue >= len(self.bumerangue):
@@ -353,6 +353,7 @@ class Leveis():
         self.pontos = 0
         self.contador = 0
         self.fonte = pygame.font.SysFont('calibri', 20, False, False)
+        self.boss = False
         self.lvl_0 = True
         self.lvl_1 = False
         self.lvl_2 = False
@@ -362,8 +363,9 @@ class Leveis():
 
     def pontuacao(self):
         texto = self.fonte.render(f'PONTOS: {self.pontos}', True, (255, 0, 0))
-        self.contador +=0.10
-        self.pontos = int(self.contador)
+        if not self.boss:
+            self.contador +=0.10
+            self.pontos = int(self.contador)
         tela.blit(texto, (10, 450))
 
     def lvl(self):
@@ -377,6 +379,7 @@ class Leveis():
             self.lvl_3 = True
             self.lvl_2 = False
         elif self.pontos >= 400:
+            #self.boss = True
             self.lvl_2 = True
             self.lvl_1 = False
         elif self.pontos >= 200:
@@ -386,8 +389,9 @@ class Leveis():
             self.lvl_0 = True
 
     def update(self):
-        self.pontuacao()
-        self.lvl()
+        if not canguru.morreu:
+            self.pontuacao()
+            self.lvl()
 
 class Fases(pygame.sprite.Sprite):
     def __init__(self):
@@ -424,7 +428,7 @@ class Gerenciador(pygame.sprite.Sprite):
         self.tempo = 0
         self.ligar_gerenciador = True
 
-        self.sorteio = randint (12,12)
+        self.sorteio = randint (1,13)
         self.grupos = {
             1: [lagarto, dingo, rato],
             2: [lagarto, lagarto3, dingo2, rato3],
@@ -483,12 +487,18 @@ class Canguru(pygame.sprite.Sprite):
         self.canguru_atacar = []
 
         self.contador_colisao = 0
+        self.contador_frames_reducao = 0
+        self.atual_parado = 0
         self.atual = 0
         self.atual_ataca = 0
         self.atual_morto = 0
         self.atual_correndo = 0
         self.gravidade = 0
         self.bug_bumerangue = 0
+        self.pulo_volta = False
+        self.pulo_avanco = False
+        self.bateu_parede = False
+        self.parou = False
         self.ferido = False
         self.morreu = False
         self.gameover = False
@@ -523,6 +533,10 @@ class Canguru(pygame.sprite.Sprite):
         self.canguru.append(carroca_canguru.subsurface((0 * 287, 0), (287, 316))),
         self.canguru.append(carroca_canguru.subsurface((3 * 287, 0), (287, 316)))
 
+        self.canguru_parado = []
+        self.canguru_parado.append(carroca_canguru_parado.subsurface((0 * 315, 0), (315, 379))),
+        self.canguru_parado.append(carroca_canguru_parado.subsurface((1 * 315, 0), (315, 379)))
+
         self.canguru_morto = []
         self.canguru_morto.append(carroca_canguru_morto.subsurface((0 * 1024, 0), (1024, 1024))),
         self.canguru_morto.append(carroca_canguru_morto.subsurface((1 * 1024, 0), (1024, 1024)))
@@ -547,6 +561,7 @@ class Canguru(pygame.sprite.Sprite):
             )
         ]
         self.queda_imagem = pygame.image.load('elementos/sprites/canguru/deitado_1.png')
+        self.queda_imagem = pygame.transform.scale(self.queda_imagem, (438 / 4, 315 / 4))
 
         self.pulo_imagem = pygame.image.load('elementos/sprites/canguru/pulo.png')
         self.pulo_imagem = pygame.transform.scale(self.pulo_imagem, (315 / 4, 379 / 4))
@@ -564,6 +579,8 @@ class Canguru(pygame.sprite.Sprite):
         self.velocidade = 10
         self.volta = 5
         self.volta_mais = 10
+
+
 
         if self.avanco and not self.avancando and not self.voltando:
             self.avancando = True
@@ -598,6 +615,12 @@ class Canguru(pygame.sprite.Sprite):
                 self.avanco = False  # Finaliza tudo
                 self.volta_rapido = False
 
+        if self.pulando and self.rect.centerx >= self.destino:
+            self.bateu_parede = True
+        if not self.pulando:
+            self.bateu_parede = False
+
+
         if self.voltando and self.avanco:
             self.avanco = False
             self.voltando = False
@@ -613,6 +636,7 @@ class Canguru(pygame.sprite.Sprite):
                     self.rect.centerx = self.origem
                     self.avanco = False
                     self.volta_rapido = False
+
 
     def atacar(self):
         if self.bumerangue.ataca:
@@ -649,11 +673,6 @@ class Canguru(pygame.sprite.Sprite):
             self.pulo_duplo = True
             self.gravidade = -27
             self.image = self.pulo_imagem
-            self.image = pygame.transform.scale(self.image, (315 / 4, 379 / 4))
-
-        if self.pulando and self.avanco and not self.voltando:
-            self.image = self.queda_imagem
-            self.queda_ar = True
 
         if self.pulo and not self.pulando:
             self.agachado = False
@@ -694,21 +713,23 @@ class Canguru(pygame.sprite.Sprite):
             if not self.animar:
                 self.atacando = True
 
-
         if not self.pulando and self.agachado:
             self.animar = False
             self.atacando = False
             self.image = self.queda_imagem
-            self.image = pygame.transform.scale(self.image, (438 / 4, 315 / 4))
+
 
         if self.pulando:
             self.rect.centery += self.gravidade
             self.gravidade += 2
 
-            if self.rect.centery >= 520:  # chão
-                self.rect.centery = 520
+
+            if self.rect.centery >= 485:  # chão
+                self.rect.centery = 485
                 self.gravidade = 0
                 self.pulando = False
+                self.pulo_avanco = False
+                self.pulo_volta = False
                 self.queda_ar = False
                 self.queda = False
                 if not self.atacando:
@@ -722,15 +743,19 @@ class Canguru(pygame.sprite.Sprite):
 
             if self.rect.centery >= 560:
                 self.pulando = False
+                self.pulo_avanco = False
+                self.pulo_volta = False
                 self.queda = False
                 self.queda_ar = False
                 teclas = pygame.key.get_pressed()
                 if teclas[pygame.K_DOWN] and not teclas[pygame.K_UP]:
-                    canguru.agachado = True
+                    self.agachado = True
+
                 if not self.atacando:
                     self.animar = True
                 if not self.animar:
                     self.atacando = True
+
 
         if pygame.key.get_pressed()[K_UP] and self.agachado:
             self.agachado = False
@@ -752,8 +777,6 @@ class Canguru(pygame.sprite.Sprite):
             if not self.animar:
                 self.atacando = True
 
-
-
     def Colisao(self):
         if not self.agachado and not self.queda and not self.queda_ar:
             canguru_hitbox_cabeca = pygame.Rect(canguru.rect.x + 25, canguru.rect.y + 10, 50, 35)
@@ -770,6 +793,21 @@ class Canguru(pygame.sprite.Sprite):
             return [canguru_hitbox_cabeca_deitado,canguru_hitbox_perna_deitado]
 
     def update(self):
+
+
+
+        if not self.pulando and pygame.key.get_pressed()[K_DOWN] and not pygame.key.get_pressed()[K_UP]:
+            self.agachado = True
+            self.parou = False  # Força sair do estado parado
+            self.rect.centery = 530
+
+        if self.pulando and self.voltando and self.avanco:
+            self.pulo_avanco = True
+        if self.pulando and self.avanco and self.volta_rapido:
+            self.pulo_volta = True
+
+
+
         if self.morreu and not self.pulando:
 
             if self.morreu and not self.atacando:
@@ -798,22 +836,42 @@ class Canguru(pygame.sprite.Sprite):
 
             if pygame.key.get_pressed()[K_UP] and not self.pulando:
                 self.buffer_pulo = True
+
             if self.pulando and pygame.key.get_pressed()[K_DOWN]:
                 self.baixo = True
                 self.cima = False
 
-            if self.pulando and self.volta_rapido:
+            if self.pulando and self.avanco:
                 self.image = self.queda_imagem
-                self.image = pygame.transform.scale(self.image, (438 / 4, 315 / 4))
+            if self.avancando and self.pulando:
+                self.image = self.queda_imagem
+
 
             elif self.pulando and not self.queda:
-                if self.image != self.queda_imagem:
+                if self.pulo_avanco:
+                    self.image = self.queda_imagem
+                    self.image = pygame.transform.scale(self.image, (438 / 4, 315 / 4))
+                if self.bateu_parede:
+                    self.image = self.queda_imagem
+                    self.image = pygame.transform.scale(self.image, (438 / 4, 315 / 4))
+                if self.pulo_volta:
+                    self.image = self.queda_imagem
+                    self.image = pygame.transform.scale(self.image, (438 / 4, 315 / 4))
+
+
+                if not self.pulo_avanco and not self.pulo_volta and not self.bateu_parede and self.image != self.queda_imagem :
                     self.image = pygame.transform.scale(self.image, (315 / 4, 379 / 4))
+
                 else:
                     self.image = pygame.transform.scale(self.image, (438 / 4, 315 / 4))
+
             elif self.pulando and self.queda:
                 if self.queda:
                     self.image = pygame.transform.scale(self.image, (438 / 4, 315 / 4))
+
+            elif self.avanco and self.pulo:
+
+                self.image = pygame.transform.scale(self.image, (438 / 4, 315 / 4))
 
             elif self.agachado:
                 self.atual_correndo += 0.15
@@ -834,6 +892,34 @@ class Canguru(pygame.sprite.Sprite):
                 self.image = pygame.transform.scale(self.image, (315 / 4, 379 / 4))
                 self.rect.centery = 485
 
+            elif leveis.boss and not self.parou:
+                incremento = 0.10 * (0.99 ** self.contador_frames_reducao)  # Reduz 2% a cada frame
+                self.atual += incremento
+
+                # Incrementa o contador para a redução (opcional, pode usar outra lógica)
+                self.contador_frames_reducao += 1
+
+                if incremento <= 0.05:
+                    self.parou = True
+
+                if self.atual >= len(self.canguru):
+                    self.atual = 0
+
+                self.image = self.canguru[int(self.atual)]
+                self.image = pygame.transform.scale(self.image, (315 / 4, 379 / 4))
+                self.rect.centery = 485
+
+            elif self.parou and not self.avanco and not self.voltando and not self.volta_rapido:
+
+
+                self.atual_parado +=0.10
+                if self.atual_parado >= len(self.canguru_parado):
+                    self.atual_parado = 0
+                self.image = self.canguru_parado[int(self.atual_parado)]
+                self.image = pygame.transform.scale(self.image, (315 / 3.6, 379 / 3.4))
+                self.rect.centery = 477
+
+
             else:
                 self.atual += 0.10
                 if self.atual >= len(self.canguru):
@@ -842,6 +928,8 @@ class Canguru(pygame.sprite.Sprite):
                 self.image = pygame.transform.scale(self.image, (315 / 4, 379 / 4))
                 self.rect.centery = 485
 
+
+
             if self.contador_colisao >= 1:
                 self.contador_colisao +=1
                 #efeito dano
@@ -849,10 +937,13 @@ class Canguru(pygame.sprite.Sprite):
                     self.image.set_alpha(100)
                 else:
                     self.image.set_alpha(180)
-
-                if self.contador_colisao >= 90:
+                #Tempo de dano
+                if self.contador_colisao >= 150:
                     self.image.set_alpha(255)
                     self.contador_colisao = 0
+
+
+
 
         grupos = self.groups()
         if grupos:
@@ -860,6 +951,7 @@ class Canguru(pygame.sprite.Sprite):
             grupo.change_layer(self, self.get_layer())
 
             self.Colisao()
+
 class Vidas_numeros(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -870,15 +962,15 @@ class Vidas_numeros(pygame.sprite.Sprite):
         self.contador_dano = 0
         self.coracao = 0
         self.vidas = 3
-        self.x = 110
-        self.y = 45
+        self.x = 105
+        self.y = 37
         self.Sprites()
 
     def Sprites(self):
         self.numeros = []
         for i in range(4):
             numero = carroca_numero_vida.subsurface((i * 200, 0), (200, 200))
-            numero = pygame.transform.scale(numero, (200 / 2.8, 200 / 2.8))
+            numero = pygame.transform.scale(numero, (200 / 3, 200 / 3))
             self.numeros.append(numero)
         self.image = self.numeros[self.vidas]
         self.rect = self.image.get_rect()
@@ -921,14 +1013,14 @@ class Vidas_rosto(pygame.sprite.Sprite):
         self.contador_dano = 0
         self.vidas = 0
         self.x = 50
-        self.y = 45
+        self.y = 36
         self.Sprites()
 
     def Sprites(self):
         self.rostos = []
         for i in range (4):
             rosto = carroca_rosto_vida.subsurface((i*500,0), (500,500))
-            rosto = pygame.transform.scale(rosto,(500/6,500/6))
+            rosto = pygame.transform.scale(rosto,(500/7,500/7))
             self.rostos.append(rosto)
         self.image = self.rostos[self.vidas]
         self.rect = self.image.get_rect()
@@ -945,7 +1037,7 @@ class Vidas_rosto(pygame.sprite.Sprite):
         self.image = self.rostos[self.vidas]
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
-class Dano_canguru(pygame.sprite.Sprite):
+class Dano_canguru_Sprite(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = None
@@ -992,13 +1084,26 @@ class Dano_canguru(pygame.sprite.Sprite):
 
                 tela.blit(self.image, self.rect)
 
-                if canguru.contador_colisao >= 90:
+                if canguru.contador_colisao == 0:
                     self.image.set_alpha(255)
-                    canguru.contador_colisao = 0
                     self.image = None
                     self.rect = None
 
 #itens
+class Mochila(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.x = 630
+        self.y = 725
+        self.image = carroca_mochila
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x,self.y)
+
+    def update(self):
+        self.image = carroca_mochila
+        self.rect = self.image.get_rect()
+        self.image = pygame.transform.scale(self.image,(1024/6,1536/6))
+        self.rect.center = (self.x, self.y)
 class Item_vida(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -1100,6 +1205,20 @@ class Item_vida(pygame.sprite.Sprite):
                 self.rect.topright = i[0], i[1]
                 tela.blit(self.image, self.rect)
             self.Colisao()
+class Progress(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.x = 610 #610
+        self.y = 400 #470
+        self.image = carroca_progresso
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x,self.y)
+
+    def update(self):
+        self.image = carroca_progresso
+        self.rect = self.image.get_rect()
+        self.image = pygame.transform.scale(self.image,(1224/8,816/8))
+        self.rect.center = (self.x, self.y)
 
 #ataques
 class Bumerangue(pygame.sprite.Sprite):
@@ -1276,6 +1395,67 @@ class Colisao(pygame.sprite.Sprite):
         self.animacao()
         if self.image:
             tela.blit(self.image, self.rect)
+
+# -------------Boss-------------#
+class Miniboss(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.contador = 0
+        self.x = 510
+        self.y = 383
+        self.base = True
+        self.ataque = False
+        self.avanco = False
+        self.vulneravel = False
+        self.derrotado = False
+        self.estado_anterior = "parado"
+        self.contador_tasmania = 0
+
+
+
+    def Sprites(self):
+        self.tasmania = []
+        for i in range(2):
+            tasmania_base = carroca_boss_base.subsurface((i*500,0), (500,320))
+            tasmania_base = pygame.transform.scale(tasmania_base,(500/2.8,320/2.8))
+            self.tasmania.append(tasmania_base)
+
+        self.image = self.tasmania[0]
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x, self.y)
+
+    def Dificuldade(self):
+        self.velocidade_animacao_base = 0.15
+
+
+    def Animacao(self):
+        if self.base:
+            estado_atual = "base"
+        elif self.ataque:
+            estado_atual = "ataque"
+        elif self.avanco:
+            estado_atual = "avanco"
+        elif self.vulneravel:
+            estado_atual = "vulneravel"
+        else:
+            estado_atual = "derrotado"
+
+        if estado_atual != self.estado_anterior:
+            self.contador_tasmania = 0
+            self.estado_anterior = estado_atual
+
+
+        if self.base:
+            if self.contador_tasmania >= len(self.tasmania):
+                self.contador_tasmania = 0
+            self.image = self.tasmania[int(self.contador_tasmania)]
+            self.contador_tasmania += self.velocidade_animacao_base
+
+    def update(self):
+        self.Sprites()
+        self.Dificuldade()
+        self.Animacao()
+        tela.blit(self.image,self.rect)
 
 #------------inimigos-----------#
 class Dingo (pygame.sprite.Sprite):
@@ -6757,18 +6937,25 @@ cursor = Cursor()
 efeitos_menu = Efeito_menu()
 
 leveis = Leveis()
-
+progresso = Progress()
 #-------------Peronsagens-----------------#
 canguru = Canguru()
 vidas_rosto = Vidas_rosto()
 vidas_numeros = Vidas_numeros()
-dano = Dano_canguru()
+dano = Dano_canguru_Sprite()
 bumerangue = Bumerangue(canguru)
 colisao = Colisao()
 canguru.bumerangue = bumerangue
 #-----------------Itens-------------------#
+mochila = Mochila()
 item_vida = Item_vida()
+
+#------------------Boss------------------#
+tasmania = Miniboss()
+
+
 #----------------Inimigos----------------#
+
 #ratos
 rato = Rato()
 rato2 = Rato2()
@@ -6853,7 +7040,7 @@ game.add(lagarto,lagarto2,lagarto3,lagarto4,lagarto5, layer=6)
 game.add( dingo,dingo2,dingo3,dingo4,dingo5,dingo6,layer=7)
 game.add(rato,rato2,rato3,rato4,rato5,rato6, layer=8)
 game.add(osso,osso2,osso3,osso4,osso5,osso6,layer=9)
-game.add(vidas_rosto,vidas_numeros,layer=10)
+game.add(vidas_rosto,vidas_numeros,mochila,progresso,layer=10)
 game.add(layer=canguru.get_layer())
 game.add(layer=dingo.get_layer())
 game.add(layer=dingo2.get_layer())

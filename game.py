@@ -1,4 +1,5 @@
 from sys import exit
+import time
 from classes import * #locals ja esta vindo
 import sys
 def Reset():
@@ -88,6 +89,9 @@ def Reset():
     # ---------junção classes--------------#
 
 
+jogo_on = False
+pause = False
+
 while True:
     tela.fill((250,250,250))
     relogio.tick(60)
@@ -98,7 +102,14 @@ while True:
             sys.exit()
 
         if event.type == KEYDOWN:
+
+
+            if not menu.menu_on and not canguru.morreu:
+                if event.key == K_RETURN and jogo_on:
+                    pause = not pause
+
             if menu.menu_on:
+
                 if event.key == K_DOWN and cursor.cima:
                     cursor.cima = False
                     cursor.meio = True
@@ -120,11 +131,14 @@ while True:
                     cursor.baixo = False
                 if event.key == K_RETURN and cursor.cima:
                     menu.menu_on = False
+                    jogo_on = True
                 if event.key == K_RETURN and cursor.baixo:
                     pygame.quit()
                     sys.exit()
 
-            if not canguru.morreu:
+
+            if not canguru.morreu and jogo_on:
+
                 if event.key == K_RIGHT:
                     canguru.avanco = True
                 if event.key == K_LEFT:
@@ -138,6 +152,7 @@ while True:
 
                 if event.key == K_1 and canguru.cima == True:
                     bumerangue.ataca= True
+
 
             if canguru.gameover and canguru.gameover2:
                 if event.key == K_DOWN and gameover_bumerangue.bumerangue_cima:
@@ -155,11 +170,9 @@ while True:
                 if event.key == K_RETURN:
                     gameover_bumerangue.bumerangue_selecionado = True
 
-
         if not canguru.morreu:
             if not canguru.pulando and 485 <= canguru.rect.centery <= 530:
                 canguru.agachado = pygame.key.get_pressed()[K_DOWN]
-
 
 
     #pontos.update()
@@ -172,24 +185,28 @@ while True:
         exit.update()
         settings.update()
     else:
-        game.update()
-        game.draw(tela)
 
-        if gameover_continue.iniciar_continue:
-            Reset()
-        if gameover_quit.iniciar_quit:
-            pygame.quit()
-            sys.exit()
+        if not pause:
+            game.update()
+            game.draw(tela)
 
+            if gameover_continue.iniciar_continue:
+                Reset()
+            if gameover_quit.iniciar_quit:
+                pygame.quit()
+                sys.exit()
 
-        gerenciador.update()
-        colisao.update()
-        dano.update()
-        gameover.update()
-        gameover_continue.update()
-        gameover_quit.update()
-        gameover_bumerangue.update()
-        leveis.update()
+            colisao.update()
+            dano.update()
+            gameover.update()
+            gameover_continue.update()
+            gameover_quit.update()
+            gameover_bumerangue.update()
+            leveis.update()
+            if not leveis.boss:
+                gerenciador.update()
+            if leveis.boss:
+                tasmania.update()
 
         #item_vida.Colisao()
         #bumerangue.Colisao()
@@ -205,5 +222,8 @@ while True:
         #rato.colisao()
         #rato3.colisao()
         #canguru.Colisao()
+
+        if pause:
+            game.draw(tela)
 
     pygame.display.flip()
