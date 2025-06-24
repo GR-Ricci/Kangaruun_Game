@@ -137,7 +137,7 @@ while True:
                     sys.exit()
 
 
-            if not canguru.morreu and jogo_on:
+            if not canguru.morreu and not canguru.loading_battle and jogo_on :
 
                 if event.key == K_RIGHT:
                     canguru.avanco = True
@@ -185,7 +185,6 @@ while True:
         exit.update()
         settings.update()
     else:
-
         if not pause:
             game.update()
             game.draw(tela)
@@ -203,10 +202,14 @@ while True:
             gameover_quit.update()
             gameover_bumerangue.update()
             leveis.update()
-            if not leveis.boss:
+            if not leveis.boss_perto and not leveis.boss:
                 gerenciador.update()
             if leveis.boss:
                 tasmania.update()
+                machado.update()
+                machado2.update()
+                machado3.update()
+                machado4.update()
 
         #item_vida.Colisao()
         #bumerangue.Colisao()
