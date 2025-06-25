@@ -202,9 +202,9 @@ while True:
             gameover_quit.update()
             gameover_bumerangue.update()
             leveis.update()
-            if not leveis.boss_perto and not leveis.boss:
+            if not leveis.boss_perto and not leveis.boss and not leveis.boss_derrotado:
                 gerenciador.update()
-            if leveis.boss:
+            if leveis.boss or leveis.boss_derrotado:
                 tasmania.update()
                 machado.update()
                 machado2.update()
