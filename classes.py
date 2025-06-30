@@ -350,10 +350,15 @@ class Gameover_bumerangue (pygame.sprite.Sprite):
 class Leveis():
 
     def __init__(self):
+        self.fim = False
+        self.inimigos_off = False
         self.pontos = 0
         self.contador = 0
         self.fonte = pygame.font.SysFont('calibri', 20, False, False)
-        self.boss = True
+        self.boss = False
+        self.boss_a = False
+        self.boss_b = False
+        self.boss_c = False
         self.boss_perto = False
         self.boss_derrotado = False
         self.lvl_0 = True
@@ -371,32 +376,45 @@ class Leveis():
         tela.blit(texto, (10, 450))
 
     def lvl(self):
-        if self.pontos >= 1000:
+        #distancia boss perto == 20
+        if self.pontos >= 1220:
+            self.fim = True
+        elif self.pontos >= 1205:
+            self.inimigos_off = True
+        elif 1205> self.pontos >= 1200:
+            self.boss_c = True
+            self.boss = True
+        elif self.pontos >= 1180:
+            self.boss_perto = True
+        elif self.pontos >= 1000:
             self.lvl_5 = True
             self.lvl_4 = False
-        elif self.pontos >= 800:
+        elif 805 > self.pontos >= 800:
             self.lvl_4 = True
             self.lvl_3 = False
+            self.boss_b = True
+            self.boss = True
+        elif self.pontos >= 780:
+            self.boss_perto = True
         elif self.pontos >= 600:
             self.lvl_3 = True
             self.lvl_2 = False
-        elif self.pontos >= 400:
-            #self.boss = True
+        elif 405 > self.pontos >= 400:
             self.lvl_2 = True
             self.lvl_1 = False
-        #elif self.pontos >= 370:
-            #self.boss_perto = True
-        elif self.pontos >= 30:
-            #self.boss = True
+            self.boss_a = True
+            self.boss = True
+        elif self.pontos >= 380:
+            self.boss_perto = True
+        elif self.pontos >= 100:
             self.lvl_1 = True
             self.lvl_0 = False
-        elif self.pontos >= 10:
-            self.boss_perto = False #True
         else:
             self.lvl_0 = True
 
+
     def update(self):
-        if not canguru.morreu:
+        if not canguru.morreu and not self.fim:
             self.pontuacao()
             self.lvl()
 
@@ -453,7 +471,6 @@ class Gerenciador(pygame.sprite.Sprite):
             12: [rato, rato2, rato3, rato4, rato5,rato6],
             13: [rato, rato2, rato3, rato4, rato5,rato6,dingo3,dingo5]}
 
-
     def sorteador(self):
         grupo_atual = self.grupos[self.sorteio]
         if all(v.spawn_on for v in grupo_atual):
@@ -481,7 +498,6 @@ class Gerenciador(pygame.sprite.Sprite):
                     self.ligar_gerenciador = True
 
 #------------Personagem-----------#
-
 #Canguru
 class Canguru(pygame.sprite.Sprite):
     def __init__(self):
@@ -529,8 +545,6 @@ class Canguru(pygame.sprite.Sprite):
         self.volta_rapido = False
         self.Sprites()
 
-
-
     def get_layer(self):
         # Define a camada de desenho com base no Y
         return 9 if self.baixo else 4
@@ -552,7 +566,6 @@ class Canguru(pygame.sprite.Sprite):
         self.canguru_morto_sem_bumerangue = []
         self.canguru_morto_sem_bumerangue.append(carroca_canguru_morto_sem_bumerangue.subsurface((0 * 1024, 0), (1024, 1024))),
         self.canguru_morto_sem_bumerangue.append(carroca_canguru_morto_sem_bumerangue.subsurface((1 * 1024, 0), (1024, 1024)))
-
 
         self.canguru_ataca = []
         self.canguru_ataca.append(carroca_canguru.subsurface((4 * 287, 0), (287, 316)))
@@ -582,11 +595,16 @@ class Canguru(pygame.sprite.Sprite):
         self.rect.center = (190, 490)
 
     def avancar(self):
-        self.destino = 450  # Corre até x = 400
         self.origem = 190
         self.velocidade = 10
         self.volta = 5
         self.volta_mais = 10
+
+        if leveis.boss:
+            self.destino = 680
+        else:
+            self.destino = 450
+
 
         if self.avanco and not self.avancando and not self.voltando:
             self.avancando = True
@@ -642,7 +660,6 @@ class Canguru(pygame.sprite.Sprite):
                     self.rect.centerx = self.origem
                     self.avanco = False
                     self.volta_rapido = False
-
 
     def atacar(self):
         if self.bumerangue.ataca:
@@ -799,6 +816,8 @@ class Canguru(pygame.sprite.Sprite):
             return [canguru_hitbox_cabeca_deitado,canguru_hitbox_perna_deitado]
 
     def update(self):
+        if leveis.fim:
+            self.rect.x += 5
 
         if not self.pulando and pygame.key.get_pressed()[K_DOWN] and not pygame.key.get_pressed()[K_UP]:
             self.agachado = True
@@ -809,8 +828,6 @@ class Canguru(pygame.sprite.Sprite):
             self.pulo_avanco = True
         if self.pulando and self.avanco and self.volta_rapido:
             self.pulo_volta = True
-
-
 
         if self.morreu and not self.pulando:
             if self.morreu and not self.atacando:
@@ -884,8 +901,13 @@ class Canguru(pygame.sprite.Sprite):
                 self.cima = False
                 if leveis.boss:
                     self.parou = True
+                    if not self.avanco and not self.voltando:
+                        self.atual_correndo =1
+                    else:
+                        self.atual_correndo += 0.15
                 else:
                     self.parou = False
+
 
             elif self.atacando:
                 self.atual_ataca += 0.10
@@ -905,7 +927,6 @@ class Canguru(pygame.sprite.Sprite):
                 if self.incremento <= 0.01:
                     self.parou = True
                     self.loading_battle = False
-                    print('canguru parou')
 
                 if self.atual >= len(self.canguru):
                     self.atual = 0
@@ -924,12 +945,14 @@ class Canguru(pygame.sprite.Sprite):
                 self.rect.centery = 477
 
             else:
+                self.parou = False
                 self.atual += 0.10
                 if self.atual >= len(self.canguru):
                     self.atual = 0
                 self.image = self.canguru[int(self.atual)]
                 self.image = pygame.transform.scale(self.image, (315 / 4, 379 / 4))
                 self.rect.centery = 485
+
 
             if self.contador_colisao >= 1:
                 self.contador_colisao += 1
@@ -1145,7 +1168,7 @@ class Item_vida(pygame.sprite.Sprite):
                 self.contador_vida = 0
 
         for i in self.movimento:
-            if not leveis.boss and self.x >=720:
+            if not leveis.boss and not leveis.inimigos_off:
                 i[0] -= self.velocidade
                 if i[0] <= -10 and not canguru.morreu:
                     self.spawn = False
@@ -1155,6 +1178,12 @@ class Item_vida(pygame.sprite.Sprite):
                     self.movimento.remove(i)
                 if canguru.morreu:
                     self.movimento.remove(i)
+            if leveis.boss and self.x >=720:
+                self.x =-100
+            if leveis.inimigos_off:
+                self.x = -100
+
+
 
     def Colisao(self):
         self.vida_hitbox = pygame.Rect(self.rect.x + 10, self.rect.y + 3, 55, 50)
@@ -1171,7 +1200,7 @@ class Item_vida(pygame.sprite.Sprite):
                         self.liberar = 0
                         self.spawn = False
                         self.reset = True
-                        print('vida')
+
 
             if self.sorteio == 2:
                 for hitbox in canguru_hitbox:
@@ -1271,7 +1300,7 @@ class Bumerangue(pygame.sprite.Sprite):
                 self.x_inicial = self.canguru.rect.x + 120  # Guarda a posição X inicial
                 self.y_fixo = self.canguru.rect.y + 100  # Guarda a posição Y inicial
 
-            self.movimento_x += 8
+            self.movimento_x += 15
             arco = ((self.movimento_x - 100) ** 2) / 1000 - 60
             self.rect.center = (self.x_inicial + self.movimento_x, self.y_fixo + arco)
 
@@ -1281,7 +1310,7 @@ class Bumerangue(pygame.sprite.Sprite):
 
         # Na volta, ajusta gradualmente para a posição atual do canguru
         elif self.voltando:
-            self.movimento_x -= 10
+            self.movimento_x -= 25
 
             # Calcula posição alvo baseada na posição ATUAL do canguru
             alvo_x = self.canguru.rect.x + 70
@@ -1401,18 +1430,19 @@ class Colisao(pygame.sprite.Sprite):
 # -------------Boss-------------#
 class Miniboss(pygame.sprite.Sprite):
 
-
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.contador = 0
-        self.sorteio_ataque = choice([1,2,3])
-        self.tempo_ataque = choice([120,260])
+        self.reset_on = False
+
+        self.contador = 10
+        self.sorteio_ataque = choice([5])
+        self.tempo_ataque = choice([240])#120,240 Boss A #80,160,240,320 Boss B
         self.boss_saiu = False
         self.boss_venceu = False
         self.controle_dano = 0
         self.tomou_dano = False
 
-        self.vida = 2
+        self.vida = 0
         self.dano = False
 
         self.indo = True
@@ -1459,7 +1489,7 @@ class Miniboss(pygame.sprite.Sprite):
         self.limite_resetb = 100
         self.posicao = False
         self.sorteio_lado = None
-        self.vulneravel_depois = True
+        self.vulneravel_depois = False
 
         self.pulo = False
         self.pulando = False
@@ -1558,6 +1588,102 @@ class Miniboss(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
 
+    def Reset(self):
+        if self.reset_on:
+            #Reset do canguru
+            pygame.sprite.Sprite.__init__(self)
+            self.contador_reset_b = 0
+            self.contador_reset_c = 0
+            self.reset_on = False
+
+            self.contador = 0
+            if leveis.boss_b:
+                self.sorteio_ataque = choice([1,2,3])
+                self.tempo_ataque = choice([40,120,160,240,280])
+            self.boss_saiu = False
+            self.boss_venceu = False
+            self.controle_dano = 0
+            self.tomou_dano = False
+
+            if leveis.boss_b:
+                self.vida = 15
+            if leveis.boss_c:
+                self.vida = 20
+
+
+            self.dano = False
+
+            self.indo = True
+            self.voltando = False
+
+            self.x = 700
+            self.y = 383
+            self.contador_teste = 0
+            self.contador = 0
+            self.descanso = 0
+
+            # controles de ataque
+            self.total = 0
+            self.flag_total = False
+            self.contador_vulneravel = 0
+            self.vulneravel_pronto = False
+
+            self.repeticao1 = 0
+            self.repeticao2 = 0
+            self.repeticao3 = 0
+            self.repeticao4 = 0
+            self.repeticao5 = 0
+
+            self.flag_repeticao1 = False
+            self.flag_repeticao2 = False
+            self.flag_repeticao3 = False
+            self.flag_repeticao4 = False
+            self.flag_repeticao5 = False
+
+            self.ladoa = True
+            self.ladob = False
+
+            self.base = True
+            self.base2 = False
+            self.ataque = False
+            self.ataqueb = False
+
+            # controles do avanco
+            self.avanco = False
+            self.limite = 50
+            self.limite_reset = 535
+            self.avancob = False
+            self.limiteb = 570
+            self.limite_resetb = 100
+            self.posicao = False
+            self.sorteio_lado = None
+            self.vulneravel_depois = False
+
+            self.pulo = False
+            self.pulando = False
+            self.descendo = False
+            self.chao = False
+            self.imagem_pulo = 0
+            self.contador_pulo = 0
+            self.vulneravel = False
+            self.derrotado = False
+            self.ataque_baixo = False
+            self.ataque_cima = False
+            self.estado_anterior = "parado"
+            self.contador_animacao = 0
+            self.contador_animacao2 = 0
+            self.contador_animacao3 = 0
+            self.contador_animacao4 = 0
+            # mudar nomes pra contador animacao ataque e ataqueb
+            self.machado1 = False
+            self.machado2 = False
+            self.machado2_indo = False
+            self.machado3 = False
+            self.machado4 = False
+            self.battle = False
+            self.Sprites()
+            self.reset_on = False
+
     def Ataques(self):
 
         if self.base:
@@ -1582,51 +1708,99 @@ class Miniboss(pygame.sprite.Sprite):
             self.flag_repeticao5 = False
             self.descanso += 1
 
-            if self.descanso >= 40:
-                if canguru.morreu:
-                    self.boss_venceu = True
-                    self.base = True
-                    self.tempo_ataque = None
-                    self.sorteio_ataque = None
-                    self.battle = False
+            if not leveis.boss_b:
+                if self.descanso >= 40:
+                    if canguru.morreu:
+                        self.boss_venceu = True
+                        self.base = True
+                        self.tempo_ataque = None
+                        self.sorteio_ataque = None
+                        self.battle = False
 
-                elif not canguru.morreu:
+                    elif not canguru.morreu:
 
-                    if self.vulneravel_pronto:
-                        self.sorteio_ataque =2
-                        self.vulneravel_depois = True
-                        self.flag_repeticao2 = True
-                        self.tempo_ataque = choice([120, 240])
-                        self.descanso = 0
-
-                    else:
-                        if self.repeticao1 >= 2:
-                            self.sorteio_ataque = choice([2, 3])
+                        if self.vulneravel_pronto:
+                            self.sorteio_ataque =2
+                            self.vulneravel_depois = True
+                            self.flag_repeticao2 = True
                             self.tempo_ataque = choice([120, 240])
                             self.descanso = 0
-                            self.repeticao1 = 0
-
-                        elif self.repeticao2 >= 3:
-                            self.sorteio_ataque = choice([1, 3])
-                            self.tempo_ataque = choice([120, 240])
-                            self.descanso = 0
-                            self.repeticao2 = 0
 
                         else:
-                            self.sorteio_ataque = choice([1, 2, 3])
-
-                            if self.sorteio_ataque == 2 and not self.vulneravel_pronto:
-                                self.flag_repeticao2 = False
-                                self.vulneravel_depois = False
+                            if self.repeticao1 >= 2:
+                                self.sorteio_ataque = choice([2, 3])
                                 self.tempo_ataque = choice([120, 240])
                                 self.descanso = 0
+                                self.repeticao1 = 0
 
-                            if self.sorteio_ataque == 3:
-                                self.tempo_ataque = None
+                            elif self.repeticao2 >= 3:
+                                self.sorteio_ataque = choice([1, 3])
+                                self.tempo_ataque = choice([120, 240])
                                 self.descanso = 0
+                                self.repeticao2 = 0
+
                             else:
+                                self.sorteio_ataque = choice([1, 2, 3])
+
+                                if self.sorteio_ataque == 2 and not self.vulneravel_pronto:
+                                    self.flag_repeticao2 = False
+                                    self.vulneravel_depois = False
+                                    self.tempo_ataque = choice([120, 240])
+                                    self.descanso = 0
+
+                                if self.sorteio_ataque == 3:
+                                    self.tempo_ataque = None
+                                    self.descanso = 0
+                                else:
+                                    self.tempo_ataque = choice([120, 240])
+                                    self.descanso = 0
+
+            else:
+                if self.descanso >= 20:
+                    if canguru.morreu:
+                        self.boss_venceu = True
+                        self.base = True
+                        self.tempo_ataque = None
+                        self.sorteio_ataque = None
+                        self.battle = False
+
+                    elif not canguru.morreu:
+
+                        if self.vulneravel_pronto:
+                            self.sorteio_ataque = 2
+                            self.vulneravel_depois = True
+                            self.flag_repeticao2 = True
+                            self.tempo_ataque = choice([80, 160])
+                            self.descanso = 0
+
+                        else:
+                            if self.repeticao1 >= 2:
+                                self.sorteio_ataque = choice([2, 3])
+                                self.tempo_ataque = choice([80, 160])
+                                self.descanso = 0
+                                self.repeticao1 = 0
+
+                            elif self.repeticao2 >= 3:
+                                self.sorteio_ataque = choice([1, 3])
                                 self.tempo_ataque = choice([120, 240])
                                 self.descanso = 0
+                                self.repeticao2 = 0
+
+                            else:
+                                self.sorteio_ataque = choice([1,2,3])
+
+                                if self.sorteio_ataque == 2 and not self.vulneravel_pronto:
+                                    self.flag_repeticao2 = False
+                                    self.vulneravel_depois = False
+                                    self.tempo_ataque = choice([160, 320])
+                                    self.descanso = 0
+
+                                if self.sorteio_ataque == 3:
+                                    self.tempo_ataque = None
+                                    self.descanso = 0
+                                else:
+                                    self.tempo_ataque = choice([160, 320])
+                                    self.descanso = 0
 
         if self.base2:
             if not self.ataqueb:
@@ -1650,13 +1824,13 @@ class Miniboss(pygame.sprite.Sprite):
             self.flag_repeticao5 = False
 
             self.descanso += 1
-
-            if self.descanso >= 30:
+            if not leveis.boss_b:
+             if self.descanso >= 30:
                 self.chao = False
 
                 if canguru.morreu:
                     self.boss_venceu = True
-                    self.base = True
+                    self.base2 = True
                     self.tempo_ataque = None
                     self.sorteio_ataque = None
                     self.battle = False
@@ -1667,14 +1841,12 @@ class Miniboss(pygame.sprite.Sprite):
                         self.tempo_ataque = choice([60, 180, 300])
                         self.vulneravel_depois = True
                         self.flag_repeticao5 = True
-
-
                         self.descanso = 0
 
                     else:
                         if self.repeticao4 >= 2:
                             self.sorteio_ataque = choice([5])
-                            self.tempo_ataque = choice([120, 240])
+
                             self.descanso = 0
                             self.repeticao4 = 0
 
@@ -1688,11 +1860,55 @@ class Miniboss(pygame.sprite.Sprite):
                             self.sorteio_ataque = choice([4,5])
                             if self.sorteio_ataque == 5 and not self.vulneravel_pronto:
                                 self.flag_repeticao5 = False
+
                                 self.vulneravel_depois = False
                                 self.descanso = 0
                             else:
                                 self.tempo_ataque = choice([120,240])
                                 self.descanso = 0
+
+            else:
+                if self.descanso >= 20:
+                    self.chao = False
+
+                    if canguru.morreu:
+                        self.boss_venceu = True
+                        self.base2 = True
+                        self.tempo_ataque = None
+                        self.sorteio_ataque = None
+                        self.battle = False
+                    elif not canguru.morreu:
+
+                        if self.vulneravel_pronto:
+                            self.sorteio_ataque = choice([5])
+                            self.tempo_ataque = choice([40, 120, 200,280])
+                            self.vulneravel_depois = True
+                            self.flag_repeticao5 = True
+
+                            self.descanso = 0
+
+                        else:
+                            if self.repeticao4 >= 2:
+                                self.sorteio_ataque = choice([5])
+                                self.tempo_ataque = choice([80, 160,320])
+                                self.descanso = 0
+                                self.repeticao4 = 0
+
+                            elif self.repeticao5 >= 3:
+                                self.sorteio_ataque = choice([4])
+                                self.tempo_ataque = choice([180, 240])
+                                self.descanso = 0
+                                self.repeticao5 = 0
+
+                            else:
+                                self.sorteio_ataque = choice([4, 5])
+                                if self.sorteio_ataque == 5 and not self.vulneravel_pronto:
+                                    self.flag_repeticao5 = False
+                                    self.vulneravel_depois = False
+                                    self.descanso = 0
+                                else:
+                                    self.tempo_ataque = choice([80, 160,320])
+                                    self.descanso = 0
 
         if self.sorteio_ataque == 1:
             if not self.flag_repeticao1:
@@ -1716,13 +1932,13 @@ class Miniboss(pygame.sprite.Sprite):
         if self.sorteio_ataque == 2:
 
             if not self.flag_repeticao2:
-                self.total += 1
                 self.repeticao1 = 0
                 self.repeticao2 += 1
                 self.repeticao3 = 0
                 self.repeticao4 =0
                 self.repeticao5 = 0
-                self.repeticao2 += 1
+                self.total += 1
+
                 self.flag_repeticao2 = True
 
             self.base = False
@@ -1785,13 +2001,22 @@ class Miniboss(pygame.sprite.Sprite):
                 self.contador = 0
 
         if self.sorteio_ataque == 5:
-
             if not self.flag_repeticao5:
                 self.sorteio_lado = choice([1, 2])
-                if self.sorteio_lado == 1:
-                    self.tempo_ataque = choice([60, 180, 300])
-                if self.sorteio_lado != 1:
-                    self.tempo_ataque = choice([120, 240])
+                if not leveis.boss_b and not self.vulneravel_pronto:
+                    if self.sorteio_lado == 1: #direito
+
+
+                        self.tempo_ataque = choice([60, 180, 300])
+
+                    if self.sorteio_lado != 1:
+
+                        self.tempo_ataque = choice([120, 240])
+                else:
+                    if self.sorteio_lado == 1:
+                        self.tempo_ataque = choice([40, 120, 200])
+                    if self.sorteio_lado != 1:
+                        self.tempo_ataque = choice([80, 160])
 
                 self.total +=1
                 self.repeticao5 +=1
@@ -1800,35 +2025,37 @@ class Miniboss(pygame.sprite.Sprite):
                 self.repeticao3 = 0
                 self.repeticao4 = 0
                 self.flag_repeticao5 = True
-
             self.base2 = False
             self.avancob = True
             self.contador += 1
 
             if self.vulneravel_depois:
-                if self.contador >= self.tempo_ataque:
+                if self.contador >= self.tempo_ataque and self.rect.x >= 320:
                     self.avancob = False
                     self.vulneravel = True
             else:
                 if self.sorteio_lado == 1:
-                    if self.contador >= self.tempo_ataque:
+                    if self.contador >= self.tempo_ataque and self.rect.x >= 320:
 
                         self.base = True
                         self.sorteio_ataque = None
-                        self.tempo_ataque = None
                         self.avancob = False
                         self.base2 = False
+                        self.contador = 0
+                        self.sorteio_lado = 0
+                else:
+                    if self.contador >= self.tempo_ataque and self.rect.x <= 0:
+                        self.base2 = True
+                        self.base = False
+                        self.avancob = False
+                        self.sorteio_ataque = None
+                        self.contador = 0
                         self.sorteio_lado = 0
 
-                elif self.contador >= self.tempo_ataque:
-                    self.base2 = True
-                    self.avancob = False
-                    self.sorteio_ataque = None
-                    self.contador = 0
-                    self.sorteio_lado = 0
 
-        if self.total >= 0:
+        if self.total >= 10:
             self.vulneravel_pronto = True
+
 
         if self.vulneravel: #ZERAR as repeticoes
             if canguru.morreu:
@@ -1848,7 +2075,7 @@ class Miniboss(pygame.sprite.Sprite):
                 self.total = 0
 
                 self.contador_vulneravel +=1
-                if self.contador_vulneravel >= 180:
+                if self.contador_vulneravel >= 150:
                     self.vulneravel = False
                     self.base = True
                     self.base2 = False
@@ -1870,16 +2097,42 @@ class Miniboss(pygame.sprite.Sprite):
                     self.repeticao5 = 0
 
     def Dificuldade(self):
-        self.velocidade_animacao_base = 0.10
-        self.velocidade_animacao_base2 = 0.10
-        self.velocidade_animacao_avanco = 0.25
-        self.velocidade_animacao_vulneravel = 0.15
-        self.velocidade_animacao_ataque = 0.10
-        self.velocidade_animacao_ataque2 = 0.08
-        self.velocidade_animacao_ataque3 = 0.10
-        self.velocidade_animacao_ataque4 = 0.08
-
-        self.velocidade_pulo = 0.25
+        if leveis.boss_a:
+            self.velocidade_animacao_base = 0.10
+            self.velocidade_animacao_base2 = 0.10
+            self.velocidade_animacao_avanco = 0.25
+            self.velocidade_avanco = 8
+            self.velocidade_animacao_vulneravel = 0.15
+            self.velocidade_animacao_ataque = 0.10
+            self.velocidade_animacao_ataque2 = 0.08
+            self.velocidade_animacao_ataque3 = 0.10
+            self.velocidade_animacao_ataque4 = 0.08
+            self.velocidade_pulo = 0.25
+            self.velocidade_pulando = 8
+        elif leveis.boss_b:
+            self.velocidade_animacao_base = 0.15
+            self.velocidade_animacao_base2 = 0.15
+            self.velocidade_animacao_avanco = 0.35
+            self.velocidade_avanco = 12
+            self.velocidade_animacao_vulneravel = 0.15 #ok
+            self.velocidade_animacao_ataque = 0.15
+            self.velocidade_animacao_ataque2 = 0.13
+            self.velocidade_animacao_ataque3 = 0.15
+            self.velocidade_animacao_ataque4 = 0.13
+            self.velocidade_pulo = 0.35
+            self.velocidade_pulando = 12
+        elif leveis.boss_c:
+            self.velocidade_animacao_base = 0.20
+            self.velocidade_animacao_base2 = 0.20
+            self.velocidade_animacao_avanco = 0.40
+            self.velocidade_avanco = 16
+            self.velocidade_animacao_vulneravel = 0.15  # ok
+            self.velocidade_animacao_ataque = 0.18
+            self.velocidade_animacao_ataque2 = 0.16
+            self.velocidade_animacao_ataque3 = 0.18
+            self.velocidade_animacao_ataque4 = 0.16
+            self.velocidade_pulo = 0.25
+            self.velocidade_pulando = 12
 
     def Animacao(self):
 
@@ -2008,12 +2261,12 @@ class Miniboss(pygame.sprite.Sprite):
 
         elif self.avanco:
             if self.indo and not self.voltando:
-                self.x -=8 #fazer randint
+                self.x -= self.velocidade_avanco
                 if self.x <= self.limite:
                     self.voltando = True
                     self.indo = False
             elif self.voltando:
-                self.x +=8
+                self.x += self.velocidade_avanco
                 if self.x >= self.limite_reset:
                     self.voltando = False
                     self.indo = True
@@ -2032,7 +2285,7 @@ class Miniboss(pygame.sprite.Sprite):
                 self.posicao = True
 
             if self.indo and not self.voltando:
-                self.x +=8
+                self.x += self.velocidade_avanco
 
                 if self.x >= self.limiteb: #650
                     self.voltando = True
@@ -2042,7 +2295,7 @@ class Miniboss(pygame.sprite.Sprite):
                 self.voltando= False
 
             elif self.voltando:
-                self.x -=8
+                self.x -= self.velocidade_avanco
 
             if self.contador_animacao >= len(self.tasmania_avancob):
                 self.contador_animacao = 0
@@ -2060,6 +2313,9 @@ class Miniboss(pygame.sprite.Sprite):
                 self.y -= 5
                 self.x -= 5
                 self.image = self.tasmania_pulo[1]
+                if leveis.boss_c:
+                    self.y -= 10
+
 
 
 
@@ -2075,7 +2331,7 @@ class Miniboss(pygame.sprite.Sprite):
 
         elif self.pulando and not self.chao:
 
-            self.x -= 8
+            self.x -= self.velocidade_pulando
             progresso = (self.x_pulando - self.x) / (self.x_pulando - 100)
             progresso = max(0.0, min(1.0, progresso))
 
@@ -2158,11 +2414,19 @@ class Miniboss(pygame.sprite.Sprite):
             canguru_hitbox = canguru.Colisao()
             for v in canguru_hitbox:
                 if self.tasmania_hitbox.colliderect(v):
-                    print('Acertou canguru')
+
                     if canguru.contador_colisao == 0:
                         vidas_rosto.dano = True
                         vidas_numeros.dano = True
                         canguru.contador_colisao = 1
+
+            if bumerangue is not None:  # Se o bumerangue existe
+                bumerangue_hitbox = bumerangue.Colisao() or []
+                for v in bumerangue_hitbox:
+                    if self.tasmania_hitbox.colliderect(v):
+                        bumerangue.indo = False
+                        bumerangue.voltando = True
+
 
         if self.vulneravel:
             if bumerangue is not None:  # Se o bumerangue existe
@@ -2170,16 +2434,18 @@ class Miniboss(pygame.sprite.Sprite):
                 for v in bumerangue_hitbox:
                     if self.tasmania_vulneravel_hitbox.colliderect(v):
                         if self.controle_dano == 0:
-                            print('Bumerangue acertou')
+
+                            bumerangue.indo = False
+                            bumerangue.voltando = True
                             self.dano = True
                             self.controle_dano += 1
 
     def update(self):
+        print(self.rect.x)
 
-        if not self.boss_saiu:
+        if not self.boss_saiu and not self.reset_on:
             self.Dificuldade()
             self.Colisao()
-            print (self.vida)
 
             if self.dano:
                 self.tomou_dano = True
@@ -2192,43 +2458,46 @@ class Miniboss(pygame.sprite.Sprite):
                    self.controle_dano = 0
                    self.tomou_dano = False
 
-            if self.vida <= 0 and not self.boss_saiu:
+            if self.vida <= 0 and not self.boss_saiu and not self.reset_on:
                 self.base = False
                 self.battle = False
                 self.derrotado = True
                 self.vulneravel = False
                 self.image = self.tasmania_derrotado[0]
-                self.x -=3
+                self.x -=5
                 leveis.boss_perto = False
                 leveis.boss = False
                 leveis.boss_derrotado = True
 
-            if self.x <= -60:
-                self.boss_saiu = True
-                leveis.boss_derrotado = False
+            if canguru.parou:
+                self.battle = True
 
-            if not leveis.boss_derrotado:
-                if not canguru.parou and not self.avanco:
-                    self.x-= 2.1
-                if canguru.parou:
-                    self.battle = True
-                if self.battle:
-                    self.Ataques()
-                if self.chao:
-                    self.x =0
-                if self.base2:
-                    self.x=0
+            if not canguru.parou and not self.battle and not canguru.morreu:
+                 self.x -= 2.1
 
-                if self.sorteio_ataque == 4:
-                    self.ataqueb = True
-                    self.x =100
-                if self.ataqueb:
-                    self.x = 100
-                    self.base2 = False
+            if self.battle:
+                self.Ataques()
+            if self.chao:
+                self.x =0
+            if self.base2:
+                self.x=0
+
+            if self.sorteio_ataque == 4:
+                self.ataqueb = True
+                self.x =100
+            if self.ataqueb:
+                self.x = 100
+                self.base2 = False
 
             self.Animacao()
             self.rect.center = (self.x, self.y)
             tela.blit(self.image, self.rect)
+
+            if self.x <= -60:
+                self.boss_saiu = True
+                self.derrotado = False
+                self.base = True
+                self.reset_on = True
 
             '''self.contador_teste +=0.5
             if self.contador_teste >= 50:
@@ -2254,7 +2523,12 @@ class Machado(pygame.sprite.Sprite):
         self.velocidade = 0
 
     def Dificuldade(self):
-        self.velocidade = 15
+        if leveis.boss_a:
+            self.velocidade = 15
+        if leveis.boss_b:
+            self.velocidade = 20
+        if leveis.boss_c:
+            self.velocidade = 25
 
     def Sprites(self):
         self.machado = []
@@ -2312,7 +2586,13 @@ class Machado2(pygame.sprite.Sprite):
         self.velocidade = 0
 
     def Dificuldade(self):
-        self.velocidade = 17
+        if leveis.boss_a:
+            self.velocidade = 17
+        if leveis.boss_b:
+            self.velocidade = 22
+        if leveis.boss_c:
+            self.velocidade =27
+
 
     def Sprites(self):
         self.machado = []
@@ -2372,7 +2652,12 @@ class Machado3(pygame.sprite.Sprite):
         self.velocidade = 0
 
     def Dificuldade(self):
-        self.velocidade = 17
+        if leveis.boss_a:
+            self.velocidade = 15
+        if leveis.boss_b:
+            self.velocidade = 20
+        if leveis.boss_c:
+            self.velocidade = 25
 
     def Sprites(self):
         self.machado = []
@@ -2428,7 +2713,12 @@ class Machado4(pygame.sprite.Sprite):
         self.velocidade = 0
 
     def Dificuldade(self):
-        self.velocidade = 17
+        if leveis.boss_a:
+            self.velocidade = 17
+        if leveis.boss_b:
+            self.velocidade = 22
+        if leveis.boss_c:
+            self.velocidade =27
 
 
 
@@ -2474,6 +2764,286 @@ class Machado4(pygame.sprite.Sprite):
             tasmania.machado4 = False
             self.x = 100
 
+class Machado5(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.direita = False
+        self.esquerda = False
+        self.indo5 = False
+        self.contador = 0
+        self.contador_reset =0
+        self.x = tasmania.x
+        self.y = tasmania.y
+        self.velocidade = 0
+        self.alvo_x = 0 # Novo atributo para a posição X do alvo
+        self.alvo_y = 0 # Novo atributo para a posição Y do alvo
+        self.velocidade_x = 0 # Novo atributo para a velocidade X do machado
+        self.velocidade_y = 0 # Novo atributo para a velocidade Y do machado
+        self.machado_disparado = False # Flag para controlar o disparo
+        self.x, self.y = tasmania.rect.center
+        self.machado_disparado = False
+        self.Sprites()
+
+    def Dificuldade(self):
+        if leveis.boss_b:
+            self.velocidade = 20
+        if leveis.boss_c:
+            self.velocidade = 30
+
+    def Sprites(self):
+        self.machado = []
+        for i in range (7):
+            machado = carroca_machado.subsurface((i * 1024, 0), (1024, 1024))
+            machado = pygame.transform.scale(machado, (1024 / 19, 1024 / 19))
+            self.machado.append(machado)
+        self.image = self.machado[0]
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x, self.y)
+
+        self.machadob = []
+        for i in range (7):
+            machadob = carroca_machadob.subsurface((i * 1024, 0), (1024, 1024))
+            machadob = pygame.transform.scale(machadob, (1024 / 19, 1024 / 19))
+            self.machadob.append(machadob)
+        self.image = self.machadob[0]
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x, self.y)
+
+    def Animacao(self):
+        if self.esquerda:
+            if self.contador >= len(self.machado):
+                self.contador = 0
+            self.image = self.machado[int(self.contador)]
+            self.contador += 0.25
+        else:
+            if self.contador >= len(self.machado):
+                self.contador = 0
+            self.image = self.machadob[int(self.contador)]
+            self.contador += 0.25
+
+    def Colisao(self):
+        self.machado1_hitbox = pygame.Rect(self.rect.x+5, self.rect.y + 5, 40, 50)
+        pygame.draw.rect(tela, (250, 200, 250), self.machado1_hitbox, 2)
+
+        canguru_hitbox = canguru.Colisao()
+        for v in canguru_hitbox:
+            if self.machado1_hitbox.colliderect(v):
+                if canguru.contador_colisao == 0:
+                    vidas_rosto.dano = True
+                    vidas_numeros.dano = True
+                    canguru.contador_colisao = 1
+
+    def update(self):
+        if not leveis.boss_a:
+            self.contador_reset += 1
+
+            if (tasmania.avanco or tasmania.avancob) and not self.machado_disparado:
+                # Calcula a direção relativa antes de disparar
+                direita = canguru.rect.centerx > tasmania.rect.centerx
+
+                if direita:
+                    self.direita = True
+                    self.esquerda = False
+                else:
+                    self.direita = False
+                    self.esquerda = True
+
+
+            # Se o machado ainda não foi disparado, e o tasmania está atacando, inicia o disparo
+            if (tasmania.avanco or tasmania.avancob) and not self.machado_disparado:
+                self.machado_disparado = True
+
+                self.x, self.y = tasmania.rect.center
+                self.rect.center = (self.x, self.y)
+
+                # Captura a posição atual do canguru no momento do disparo
+                self.alvo_x, self.alvo_y = canguru.rect.center
+
+                # Calcula a direção inicial (apenas uma vez no disparo)
+                self.calcular_direcao()
+
+            # Se o machado foi disparado, ele segue voando
+            if self.machado_disparado:
+                self.x += self.velocidade_x
+                self.y += self.velocidade_y
+                self.rect.center = (int(self.x), int(self.y))
+
+                self.Colisao()
+                self.Animacao()
+                self.Dificuldade()
+                tela.blit(self.image, self.rect)
+
+                # Reset se sair da tela ou atingir o alvo
+                if self.contador_reset >= 30:
+                    self.reset_machado()
+
+            # Se não está em movimento, apenas fica preso no personagem
+            elif not self.machado_disparado:
+                self.x, self.y = tasmania.rect.center
+                self.rect.center = (self.x, self.y)
+
+    def calcular_direcao(self):
+
+        if not canguru.pulando:
+            delta_x = self.alvo_x - self.x
+            distancia = max(1, math.hypot(delta_x))
+            if leveis.boss_b:
+                velocidade_total = 18
+                self.velocidade_x = (delta_x / distancia) * velocidade_total
+            else:
+                velocidade_total = 20
+                self.velocidade_x = (delta_x / distancia) * velocidade_total
+
+        else:
+            """Calcula a direção do machado baseado na posição atual e do alvo"""
+            delta_x = self.alvo_x - self.x
+            delta_y = self.alvo_y - self.y
+            distancia = max(1, math.hypot(delta_x, delta_y))
+
+            if leveis.boss_b:
+                velocidade_total = 18
+                self.velocidade_x = (delta_x / distancia) * velocidade_total
+                self.velocidade_y = (delta_y / distancia) * velocidade_total
+            else:
+                velocidade_total = 20
+                self.velocidade_x = (delta_x / distancia) * velocidade_total
+                self.velocidade_y = (delta_y / distancia) * velocidade_total
+
+    def reset_machado(self):
+        """Reseta o machado para a posição inicial"""
+        self.machado_disparado = False
+        self.contador_reset = 0
+        self.x, self.y = tasmania.rect.center
+        self.rect.center = (self.x, self.y)
+
+class Machado6(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.ataques = 0
+        self.ataque1 = True
+        self.ataque2 = False
+        self.ataque3 = False
+        self.indo5 = False
+        self.contador = 0
+        self.contador_reset =0
+        self.x = tasmania.x
+        self.y = tasmania.y
+        self.velocidade = 0
+        self.alvo_x = 0 # Novo atributo para a posição X do alvo
+        self.alvo_y = 0 # Novo atributo para a posição Y do alvo
+        self.velocidade_x = 0 # Novo atributo para a velocidade X do machado
+        self.velocidade_y = 0 # Novo atributo para a velocidade Y do machado
+        self.machado_disparado = False # Flag para controlar o disparo
+        self.x, self.y = tasmania.rect.center
+        self.machado_disparado = False
+        self.Sprites()
+
+
+    def Dificuldade(self):
+        if leveis.boss_b:
+            self.velocidade = 20
+
+    def Sprites(self):
+        self.machado = []
+        for i in range (7):
+            machado = carroca_machado.subsurface((i * 1024, 0), (1024, 1024))
+            machado = pygame.transform.scale(machado, (1024 / 19, 1024 / 19))
+            self.machado.append(machado)
+        self.machado3 = []
+        for i in range(7):
+            machadob = carroca_machadob.subsurface((i * 1024, 0), (1024, 1024))
+            machadob = pygame.transform.scale(machadob, (1024 / 19, 1024 / 19))
+            self.machado3.append(machadob)
+
+
+        self.image = self.machado[0]
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x, self.y)
+
+    def Animacao(self):
+        if not self.ataque3:
+            if self.contador >= len(self.machado):
+                self.contador = 0
+            self.image = self.machado[int(self.contador)]
+            self.contador += 0.25
+        else:
+            if self.contador >= len(self.machado):
+                self.contador = 0
+            self.image = self.machado3[int(self.contador)]
+            self.contador += 0.25
+
+
+    def Colisao(self):
+        self.machado1_hitbox = pygame.Rect(self.rect.x+5, self.rect.y + 5, 40, 50)
+        pygame.draw.rect(tela, (250, 200, 250), self.machado1_hitbox, 2)
+
+        canguru_hitbox = canguru.Colisao()
+        for v in canguru_hitbox:
+            if self.machado1_hitbox.colliderect(v):
+                if canguru.contador_colisao == 0:
+                    vidas_rosto.dano = True
+                    vidas_numeros.dano = True
+                    canguru.contador_colisao = 1
+
+    def update(self):
+
+        if leveis.boss_c:
+
+            # Se o machado ainda não foi disparado, e o tasmania está atacando, inicia o disparo
+            if (tasmania.pulo or tasmania.pulando) and not self.machado_disparado:
+                self.machado_disparado = True
+
+
+            # Se o machado foi disparado, ele segue voando
+            if self.machado_disparado:
+                self.contador_reset += 1
+                if self.ataque3:
+                    self.x += 20
+
+
+                elif self.ataque2:
+                    self.y += 20
+
+                elif self.ataque1:
+                    self.x -= 20
+
+                self.rect.center = (int(self.x), int(self.y))
+
+                self.Colisao()
+                self.Animacao()
+                self.Dificuldade()
+                tela.blit(self.image, self.rect)
+
+                # Reset se sair da tela ou atingir o alvo
+                if self.contador_reset >= 23:
+                    self.reset_machado()
+
+            # Se não está em movimento, apenas fica preso no personagem
+            elif not self.machado_disparado:
+                self.x, self.y = tasmania.rect.center
+                self.rect.center = (self.x, self.y)
+
+
+    def reset_machado(self):
+        """Reseta o machado para a posição inicial"""
+        if self.ataque1:
+            self.ataque1 = False
+            self.ataque2 = True
+            self.machado_disparado = False
+            self.contador_reset = 0
+        if self.ataque2 and self.machado_disparado:
+            self.ataque2 = False
+            self.ataque3 = True
+            self.machado_disparado = False
+            self.contador_reset = 0
+        if self.ataque3 and self.machado_disparado:
+            self.ataque3 = False
+            self.ataque1 = True
+            self.machado_disparado = False
+            self.contador_reset = 0
+
+        self.x, self.y = tasmania.rect.center
+        self.rect.center = (self.x, self.y)
 
 #------------inimigos-----------#
 class Dingo (pygame.sprite.Sprite):
@@ -6145,8 +6715,6 @@ class Osso(pygame.sprite.Sprite):
             if rato.rect.x <= -10:
                 self.atirar = False
 
-
-
     def Colisao(self):
         osso_hitbox = pygame.Rect(self.rect.x + 55, self.rect.y + 70, 40, 30)
         pygame.draw.rect(tela, (250, 105, 180), osso_hitbox, 2)
@@ -6820,9 +7388,10 @@ class Nuvem(pygame.sprite.Sprite):
 
         if leveis.boss:
             self.velocidade *= 0.98
-
             if self.velocidade > -0.20:
                 self.velocidade = -0.1
+        else:
+            self.velocidade = -1
 
 class Nuvem2(pygame.sprite.Sprite):
     def __init__(self):
@@ -6874,6 +7443,8 @@ class Nuvem2(pygame.sprite.Sprite):
 
             if self.velocidade > -0.20:
                 self.velocidade = -0.1
+        else:
+            self.velocidade = -1
 
 class Nuvem3(pygame.sprite.Sprite):
     def __init__(self):
@@ -6926,6 +7497,8 @@ class Nuvem3(pygame.sprite.Sprite):
 
             if self.velocidade > -0.20:
                 self.velocidade = -0.1
+        else:
+            self.velocidade = -1
 
 class Nuvem4(pygame.sprite.Sprite):
     def __init__(self):
@@ -6978,6 +7551,8 @@ class Nuvem4(pygame.sprite.Sprite):
 
             if self.velocidade > -0.20:
                 self.velocidade = -0.1
+        else:
+            self.velocidade = -1
 
 class Nuvem5(pygame.sprite.Sprite):
     def __init__(self):
@@ -7030,7 +7605,8 @@ class Nuvem5(pygame.sprite.Sprite):
 
             if self.velocidade > -0.20:
                 self.velocidade = -0.1
-
+        else:
+            self.velocidade = -1
 
 class Montanha(pygame.sprite.Sprite):
     def __init__(self):
@@ -7082,6 +7658,8 @@ class Montanha(pygame.sprite.Sprite):
 
             if self.velocidade > -0.10:
                 self.velocidade = 0
+        else:
+            self.velocidade = -0.5
 
 class Montanhas(pygame.sprite.Sprite):
     def __init__(self):
@@ -7137,6 +7715,8 @@ class Montanhas(pygame.sprite.Sprite):
 
             if self.velocidade > -0.10:
                 self.velocidade = 0
+        else:
+            self.velocidade = -0.5
 
 class Montanhas2(pygame.sprite.Sprite):
     def __init__(self):
@@ -7190,6 +7770,9 @@ class Montanhas2(pygame.sprite.Sprite):
 
             if self.velocidade > -0.10:
                 self.velocidade = 0
+
+        else:
+            self.velocidade = -0.5
 
 class Elementos(pygame.sprite.Sprite):
     def __init__(self):
@@ -7299,6 +7882,9 @@ class Elementos(pygame.sprite.Sprite):
             if self.velocidade > -0.30:
                 self.velocidade = 0
 
+        else:
+            self.velocidade = -2
+
 class Elementos2(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -7373,6 +7959,8 @@ class Elementos2(pygame.sprite.Sprite):
 
             if self.velocidade > -0.30:
                 self.velocidade = 0
+        else:
+            self.velocidade = -2
 
 class Elementos3(pygame.sprite.Sprite):
     def __init__(self):
@@ -7479,6 +8067,8 @@ class Elementos3(pygame.sprite.Sprite):
 
             if self.velocidade > -0.30:
                 self.velocidade = 0
+        else:
+            self.velocidade = -2
 
 class Grama(pygame.sprite.Sprite):
     def __init__(self):
@@ -7533,6 +8123,8 @@ class Grama(pygame.sprite.Sprite):
 
             if self.velocidade > -0.30:
                 self.velocidade = 0
+        else:
+            self.velocidade = -2
 
 class Grama2(pygame.sprite.Sprite):
     def __init__(self):
@@ -7588,6 +8180,9 @@ class Grama2(pygame.sprite.Sprite):
             if self.velocidade > -0.30:
                 self.velocidade = 0
 
+        else:
+            self.velocidade = -2
+
 class Grama3(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -7641,6 +8236,9 @@ class Grama3(pygame.sprite.Sprite):
 
             if self.velocidade > -0.30:
                 self.velocidade = 0
+
+        else:
+            self.velocidade = -2
 
 class Tufo(pygame.sprite.Sprite):
     def __init__(self):
@@ -7714,7 +8312,8 @@ class Tufo(pygame.sprite.Sprite):
 
             if self.velocidade < 2:
                 self.velocidade = 2
-
+        else:
+            self.velocidade = -2
 
 class Chao(pygame.sprite.Sprite):
     def __init__(self):
@@ -7758,6 +8357,8 @@ class Chao(pygame.sprite.Sprite):
 
             if self.velocidade > -0.10:
                 self.velocidade = 0
+        else:
+            self.velocidade = -1
 
 
 
@@ -7808,6 +8409,9 @@ class Chao2(pygame.sprite.Sprite):
             if self.velocidade > -0.10:
                 self.velocidade = 0
 
+        else:
+            self.velocidade = -1
+
 
         for i in self.movimento:
             self.rect = self.image.get_rect()
@@ -7841,8 +8445,10 @@ class Chao3(pygame.sprite.Sprite):
                 self.movimento = [[self.x, self.y]]
 
 
+
+
     def update(self):
-        print(self.x)
+
         if canguru.morreu:
             self.velocidade = 0
         self.Animar()
@@ -7856,6 +8462,9 @@ class Chao3(pygame.sprite.Sprite):
 
             if self.velocidade > -0.10:
                 self.velocidade = 0
+
+        else:
+            self.velocidade = -1
 
         for i in self.movimento:
             self.rect = self.image.get_rect()
@@ -8082,9 +8691,6 @@ class Lua(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
 
-
-
-
 #classes
 menu = Menu()
 kangaruun = Kangaruun()
@@ -8114,6 +8720,8 @@ machado = Machado()
 machado2 = Machado2()
 machado3 = Machado3()
 machado4 = Machado4()
+machado5 = Machado5()
+machado6 = Machado6()
 #----------------Inimigos----------------#
 
 #ratos

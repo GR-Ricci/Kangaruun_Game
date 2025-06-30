@@ -92,6 +92,8 @@ def Reset():
 jogo_on = False
 pause = False
 
+
+
 while True:
     tela.fill((250,250,250))
     relogio.tick(60)
@@ -137,7 +139,7 @@ while True:
                     sys.exit()
 
 
-            if not canguru.morreu and not canguru.loading_battle and jogo_on :
+            if not canguru.morreu and not canguru.loading_battle and not leveis.inimigos_off and jogo_on :
 
                 if event.key == K_RIGHT:
                     canguru.avanco = True
@@ -170,7 +172,7 @@ while True:
                 if event.key == K_RETURN:
                     gameover_bumerangue.bumerangue_selecionado = True
 
-        if not canguru.morreu:
+        if not canguru.morreu and not leveis.inimigos_off:
             if not canguru.pulando and 485 <= canguru.rect.centery <= 530:
                 canguru.agachado = pygame.key.get_pressed()[K_DOWN]
 
@@ -202,14 +204,23 @@ while True:
             gameover_quit.update()
             gameover_bumerangue.update()
             leveis.update()
-            if not leveis.boss_perto and not leveis.boss and not leveis.boss_derrotado:
+
+            if not leveis.boss_perto and not leveis.boss and not leveis.boss_derrotado and not leveis.inimigos_off:
                 gerenciador.update()
-            if leveis.boss or leveis.boss_derrotado:
+
+            if leveis.boss or tasmania.derrotado:
                 tasmania.update()
                 machado.update()
                 machado2.update()
                 machado3.update()
                 machado4.update()
+                machado5.update()
+                machado6.update()
+            if tasmania.reset_on:
+                tasmania.derrotado = False
+                tasmania.Reset()
+
+
 
         #item_vida.Colisao()
         #bumerangue.Colisao()
