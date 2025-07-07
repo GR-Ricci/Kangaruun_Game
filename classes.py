@@ -1,6 +1,5 @@
 from random import randint
 from random import choice
-
 import pygame.transform
 import math
 from recursos import*
@@ -402,16 +401,15 @@ class Leveis():
         elif 405 > self.pontos >= 400:
             self.lvl_2 = True
             self.lvl_1 = False
-            self.boss_a = True
+            self.boss_b = True
             self.boss = True
         elif self.pontos >= 380:
             self.boss_perto = True
-        elif self.pontos >= 100:
+        elif 15> self.pontos >= 200:
             self.lvl_1 = True
             self.lvl_0 = False
         else:
             self.lvl_0 = True
-
 
     def update(self):
         if not canguru.morreu and not self.fim:
@@ -816,6 +814,7 @@ class Canguru(pygame.sprite.Sprite):
             return [canguru_hitbox_cabeca_deitado,canguru_hitbox_perna_deitado]
 
     def update(self):
+
         if leveis.fim:
             self.rect.x += 5
 
@@ -965,8 +964,10 @@ class Canguru(pygame.sprite.Sprite):
                 if self.contador_colisao >= 150:
                     self.image.set_alpha(255)
                     self.contador_colisao = 0
+
         if self.contador_colisao == 0:
             self.image.set_alpha(255)
+
         grupos = self.groups()
         if grupos:
             grupo = grupos[0]
@@ -1000,7 +1001,7 @@ class Vidas_numeros(pygame.sprite.Sprite):
 
     def update(self):
         if self.dano and self.vidas > 0:
-            self.vidas -= 1
+            self.vidas -= 0
             self.dano = False
 
         if item_vida.ganha_vida and self.vidas < 3 and self.vidas > 0:
@@ -1111,7 +1112,7 @@ class Dano_canguru_Sprite(pygame.sprite.Sprite):
                     self.image = None
                     self.rect = None
 
-#itens
+#--itens
 class Mochila(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -1251,7 +1252,7 @@ class Progress(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image,(1224/8,816/8))
         self.rect.center = (self.x, self.y)
 
-#ataques
+#--ataques
 class Bumerangue(pygame.sprite.Sprite):
     def __init__(self,canguru):
         pygame.sprite.Sprite.__init__(self)
@@ -1433,16 +1434,17 @@ class Miniboss(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.reset_on = False
-
+        self.contador_colisao = 0
         self.contador = 10
-        self.sorteio_ataque = choice([5])
-        self.tempo_ataque = choice([240])#120,240 Boss A #80,160,240,320 Boss B
+        self.sorteio_ataque = choice([1,2,3])
+        self.tempo_ataque = choice([120,240])
         self.boss_saiu = False
         self.boss_venceu = False
         self.controle_dano = 0
         self.tomou_dano = False
 
-        self.vida = 0
+        self.vida = 10
+
         self.dano = False
 
         self.indo = True
@@ -1589,27 +1591,120 @@ class Miniboss(pygame.sprite.Sprite):
         self.rect.center = (self.x, self.y)
 
     def Reset(self):
-        if self.reset_on:
+        if self.reset_on and leveis.boss_b:
             #Reset do canguru
-            pygame.sprite.Sprite.__init__(self)
+            canguru.loading_battle = True
+            canguru.atual = 0
+            canguru.parou = False  # Resetar isso também
+            canguru.contador_frames_reducao = 0
+
+
             self.contador_reset_b = 0
             self.contador_reset_c = 0
-            self.reset_on = False
-
+            self.contador_colisao = 0
             self.contador = 0
-            if leveis.boss_b:
-                self.sorteio_ataque = choice([1,2,3])
-                self.tempo_ataque = choice([40,120,160,240,280])
+            self.sorteio_ataque = choice([1,2,3])
+            self.tempo_ataque = choice([40,120,160,240,280])
             self.boss_saiu = False
             self.boss_venceu = False
             self.controle_dano = 0
             self.tomou_dano = False
 
-            if leveis.boss_b:
-                self.vida = 15
-            if leveis.boss_c:
-                self.vida = 20
 
+            self.vida = 15
+
+            self.dano = False
+            self.indo = True
+            self.voltando = False
+
+            self.x = 700
+            self.y = 383
+            self.contador_teste = 0
+            self.contador = 0
+            self.descanso = 0
+
+            # controles de ataque
+            self.total = 0
+            self.flag_total = False
+            self.contador_vulneravel = 0
+            self.vulneravel_pronto = False
+
+            self.repeticao1 = 0
+            self.repeticao2 = 0
+            self.repeticao3 = 0
+            self.repeticao4 = 0
+            self.repeticao5 = 0
+
+            self.flag_repeticao1 = False
+            self.flag_repeticao2 = False
+            self.flag_repeticao3 = False
+            self.flag_repeticao4 = False
+            self.flag_repeticao5 = False
+
+            self.ladoa = True
+            self.ladob = False
+
+            self.base = True
+            self.base2 = False
+            self.ataque = False
+            self.ataqueb = False
+
+            # controles do avanco
+            self.avanco = False
+            self.limite = 50
+            self.limite_reset = 535
+            self.avancob = False
+            self.limiteb = 570
+            self.limite_resetb = 100
+            self.posicao = False
+            self.sorteio_lado = None
+            self.vulneravel_depois = False
+
+            self.pulo = False
+            self.pulando = False
+            self.descendo = False
+            self.chao = False
+            self.imagem_pulo = 0
+            self.contador_pulo = 0
+            self.vulneravel = False
+            self.derrotado = False
+            self.ataque_baixo = False
+            self.ataque_cima = False
+            self.estado_anterior = "parado"
+            self.contador_animacao = 0
+            self.contador_animacao2 = 0
+            self.contador_animacao3 = 0
+            self.contador_animacao4 = 0
+            # mudar nomes pra contador animacao ataque e ataqueb
+            self.machado1 = False
+            self.machado2 = False
+            self.machado2_indo = False
+            self.machado3 = False
+            self.machado4 = False
+            self.battle = False
+            self.Sprites()
+            self.reset_on = False
+
+        elif self.reset_on and leveis.boss_c:
+            #Reset do canguru
+            canguru.loading_battle = True
+            canguru.atual = 0
+            canguru.parou = False  # Resetar isso também
+            canguru.contador_frames_reducao = 0
+
+            self.contador_reset_b = 0
+            self.contador_reset_c = 0
+            self.contador_colisao = 0
+            self.contador = 0
+            self.sorteio_ataque = choice([1, 2, 3])
+            self.tempo_ataque = choice([120, 240])
+            self.boss_saiu = False
+            self.boss_venceu = False
+            self.controle_dano = 0
+            self.tomou_dano = False
+
+
+            self.vida = 20
 
             self.dano = False
 
@@ -1946,11 +2041,11 @@ class Miniboss(pygame.sprite.Sprite):
             self.contador += 1
 
             if self.vulneravel_depois:
-                if self.contador >= self.tempo_ataque:
+                if self.contador >= self.tempo_ataque and self.rect.x >= 320:
                     self.avanco = False
                     self.vulneravel = True
             else:
-                if self.contador >= self.tempo_ataque:
+                if self.contador >= self.tempo_ataque and self.rect.x >= 320:
                     self.base = True
                     self.avanco = False
                     self.sorteio_ataque = None
@@ -2044,7 +2139,7 @@ class Miniboss(pygame.sprite.Sprite):
                         self.contador = 0
                         self.sorteio_lado = 0
                 else:
-                    if self.contador >= self.tempo_ataque and self.rect.x <= 0:
+                    if self.contador >= self.tempo_ataque and self.rect.x <= -100:
                         self.base2 = True
                         self.base = False
                         self.avancob = False
@@ -2053,7 +2148,7 @@ class Miniboss(pygame.sprite.Sprite):
                         self.sorteio_lado = 0
 
 
-        if self.total >= 10:
+        if self.total >= 1:
             self.vulneravel_pronto = True
 
 
@@ -2075,8 +2170,9 @@ class Miniboss(pygame.sprite.Sprite):
                 self.total = 0
 
                 self.contador_vulneravel +=1
-                if self.contador_vulneravel >= 150:
+                if (self.contador_vulneravel >= 150) or (self.contador_colisao >= 4):
                     self.vulneravel = False
+                    self.contador_colisao= 0
                     self.base = True
                     self.base2 = False
                     self.descanso = 0
@@ -2122,15 +2218,15 @@ class Miniboss(pygame.sprite.Sprite):
             self.velocidade_pulo = 0.35
             self.velocidade_pulando = 12
         elif leveis.boss_c:
-            self.velocidade_animacao_base = 0.20
-            self.velocidade_animacao_base2 = 0.20
-            self.velocidade_animacao_avanco = 0.40
-            self.velocidade_avanco = 16
+            self.velocidade_animacao_base = 0.15
+            self.velocidade_animacao_base2 = 0.15
+            self.velocidade_animacao_avanco = 0.38
+            self.velocidade_avanco = 14
             self.velocidade_animacao_vulneravel = 0.15  # ok
-            self.velocidade_animacao_ataque = 0.18
-            self.velocidade_animacao_ataque2 = 0.16
-            self.velocidade_animacao_ataque3 = 0.18
-            self.velocidade_animacao_ataque4 = 0.16
+            self.velocidade_animacao_ataque = 0.15
+            self.velocidade_animacao_ataque2 = 0.13
+            self.velocidade_animacao_ataque3 = 0.13
+            self.velocidade_animacao_ataque4 = 0.13
             self.velocidade_pulo = 0.25
             self.velocidade_pulando = 12
 
@@ -2441,7 +2537,6 @@ class Miniboss(pygame.sprite.Sprite):
                             self.controle_dano += 1
 
     def update(self):
-        print(self.rect.x)
 
         if not self.boss_saiu and not self.reset_on:
             self.Dificuldade()
@@ -2450,11 +2545,12 @@ class Miniboss(pygame.sprite.Sprite):
             if self.dano:
                 self.tomou_dano = True
                 self.vida -=1
+                self.contador_colisao +=1
                 self.dano = False
 
             if self.tomou_dano:
                 self.controle_dano +=1
-                if self.controle_dano == 30:
+                if self.controle_dano == 10:
                    self.controle_dano = 0
                    self.tomou_dano = False
 
@@ -2464,10 +2560,12 @@ class Miniboss(pygame.sprite.Sprite):
                 self.derrotado = True
                 self.vulneravel = False
                 self.image = self.tasmania_derrotado[0]
-                self.x -=5
+                self.x -=3
                 leveis.boss_perto = False
                 leveis.boss = False
                 leveis.boss_derrotado = True
+                canguru.parou = False
+                self.battle = False
 
             if canguru.parou:
                 self.battle = True
@@ -2512,7 +2610,7 @@ class Miniboss(pygame.sprite.Sprite):
             if self.contador_teste >= 320:
                 self.vulneravel = False
                 self.derrotado = True'''
-
+#--
 class Machado(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -2525,10 +2623,8 @@ class Machado(pygame.sprite.Sprite):
     def Dificuldade(self):
         if leveis.boss_a:
             self.velocidade = 15
-        if leveis.boss_b:
+        else:
             self.velocidade = 20
-        if leveis.boss_c:
-            self.velocidade = 25
 
     def Sprites(self):
         self.machado = []
@@ -2575,7 +2671,6 @@ class Machado(pygame.sprite.Sprite):
             tasmania.machado1= False
             self.indo = False
             self.x = 480
-
 class Machado2(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -2588,11 +2683,8 @@ class Machado2(pygame.sprite.Sprite):
     def Dificuldade(self):
         if leveis.boss_a:
             self.velocidade = 17
-        if leveis.boss_b:
+        else:
             self.velocidade = 22
-        if leveis.boss_c:
-            self.velocidade =27
-
 
     def Sprites(self):
         self.machado = []
@@ -2642,7 +2734,6 @@ class Machado2(pygame.sprite.Sprite):
             tasmania.machado2 = False
             self.indo = False
             self.x = 550
-
 class Machado3(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -2654,10 +2745,9 @@ class Machado3(pygame.sprite.Sprite):
     def Dificuldade(self):
         if leveis.boss_a:
             self.velocidade = 15
-        if leveis.boss_b:
+        else:
             self.velocidade = 20
-        if leveis.boss_c:
-            self.velocidade = 25
+
 
     def Sprites(self):
         self.machado = []
@@ -2702,7 +2792,6 @@ class Machado3(pygame.sprite.Sprite):
         if self.x >= 665:
             tasmania.machado3 = False
             self.x = 115
-
 class Machado4(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -2715,10 +2804,9 @@ class Machado4(pygame.sprite.Sprite):
     def Dificuldade(self):
         if leveis.boss_a:
             self.velocidade = 17
-        if leveis.boss_b:
+        else:
             self.velocidade = 22
-        if leveis.boss_c:
-            self.velocidade =27
+
 
 
 
@@ -2763,7 +2851,6 @@ class Machado4(pygame.sprite.Sprite):
         if self.x >= 665:
             tasmania.machado4 = False
             self.x = 100
-
 class Machado5(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -2786,9 +2873,9 @@ class Machado5(pygame.sprite.Sprite):
 
     def Dificuldade(self):
         if leveis.boss_b:
-            self.velocidade = 20
+            self.velocidade = 15
         if leveis.boss_c:
-            self.velocidade = 30
+            self.velocidade = 17
 
     def Sprites(self):
         self.machado = []
@@ -2833,12 +2920,47 @@ class Machado5(pygame.sprite.Sprite):
                     vidas_numeros.dano = True
                     canguru.contador_colisao = 1
 
+    def calcular_direcao(self):
+        """Calcula a direção do machado baseado no estado do canguru no momento do disparo"""
+        self.alvo_x, self.alvo_y = canguru.rect.center  # Pega a posição atual do canguru
+
+        if not canguru.pulando:  # Se o canguru NÃO está pulando, mira apenas no eixo X
+            delta_x = self.alvo_x - self.x
+            distancia = max(1, abs(delta_x))  # Usamos abs() pois só importa a magnitude
+
+            if leveis.boss_b:
+                velocidade_total = 20
+                self.velocidade_x = (delta_x / distancia) * velocidade_total
+                self.velocidade_y = 0  # Zera o Y para não ter movimento vertical
+            else:
+                velocidade_total = 22
+                self.velocidade_x = (delta_x / distancia) * velocidade_total
+                self.velocidade_y = 0  # Zera o Y para não ter movimento vertical
+        else:  # Se o canguru ESTÁ pulando, mira em X e Y
+            delta_x = self.alvo_x - self.x
+            delta_y = self.alvo_y - self.y
+            distancia = max(1, math.hypot(delta_x, delta_y))  # Distância euclidiana
+
+            if leveis.boss_b:
+                velocidade_total = 20
+                self.velocidade_x = (delta_x / distancia) * velocidade_total
+                self.velocidade_y = (delta_y / distancia) * velocidade_total
+            else:
+                velocidade_total = 22
+                self.velocidade_x = (delta_x / distancia) * velocidade_total
+                self.velocidade_y = (delta_y / distancia) * velocidade_total
+
+    def reset_machado(self):
+        """Reseta o machado para a posição inicial"""
+        self.machado_disparado = False
+        self.x, self.y = tasmania.rect.center
+        self.rect.center = (self.x, self.y)
+        self.contador_reset = 0
+
     def update(self):
         if not leveis.boss_a:
-            self.contador_reset += 1
-
+            # Se o machado ainda não foi disparado, e o tasmania está atacando, inicia o disparo
             if (tasmania.avanco or tasmania.avancob) and not self.machado_disparado:
-                # Calcula a direção relativa antes de disparar
                 direita = canguru.rect.centerx > tasmania.rect.centerx
 
                 if direita:
@@ -2848,9 +2970,6 @@ class Machado5(pygame.sprite.Sprite):
                     self.direita = False
                     self.esquerda = True
 
-
-            # Se o machado ainda não foi disparado, e o tasmania está atacando, inicia o disparo
-            if (tasmania.avanco or tasmania.avancob) and not self.machado_disparado:
                 self.machado_disparado = True
 
                 self.x, self.y = tasmania.rect.center
@@ -2864,6 +2983,7 @@ class Machado5(pygame.sprite.Sprite):
 
             # Se o machado foi disparado, ele segue voando
             if self.machado_disparado:
+                self.contador_reset += 1
                 self.x += self.velocidade_x
                 self.y += self.velocidade_y
                 self.rect.center = (int(self.x), int(self.y))
@@ -2874,48 +2994,18 @@ class Machado5(pygame.sprite.Sprite):
                 tela.blit(self.image, self.rect)
 
                 # Reset se sair da tela ou atingir o alvo
-                if self.contador_reset >= 30:
-                    self.reset_machado()
+                if leveis.boss_b:
+                    if self.contador_reset >= 40:
+                        self.reset_machado()
+                elif leveis.boss_c:
+                    if self.contador_reset >= 35:
+                        self.reset_machado()
+
 
             # Se não está em movimento, apenas fica preso no personagem
             elif not self.machado_disparado:
                 self.x, self.y = tasmania.rect.center
                 self.rect.center = (self.x, self.y)
-
-    def calcular_direcao(self):
-
-        if not canguru.pulando:
-            delta_x = self.alvo_x - self.x
-            distancia = max(1, math.hypot(delta_x))
-            if leveis.boss_b:
-                velocidade_total = 18
-                self.velocidade_x = (delta_x / distancia) * velocidade_total
-            else:
-                velocidade_total = 20
-                self.velocidade_x = (delta_x / distancia) * velocidade_total
-
-        else:
-            """Calcula a direção do machado baseado na posição atual e do alvo"""
-            delta_x = self.alvo_x - self.x
-            delta_y = self.alvo_y - self.y
-            distancia = max(1, math.hypot(delta_x, delta_y))
-
-            if leveis.boss_b:
-                velocidade_total = 18
-                self.velocidade_x = (delta_x / distancia) * velocidade_total
-                self.velocidade_y = (delta_y / distancia) * velocidade_total
-            else:
-                velocidade_total = 20
-                self.velocidade_x = (delta_x / distancia) * velocidade_total
-                self.velocidade_y = (delta_y / distancia) * velocidade_total
-
-    def reset_machado(self):
-        """Reseta o machado para a posição inicial"""
-        self.machado_disparado = False
-        self.contador_reset = 0
-        self.x, self.y = tasmania.rect.center
-        self.rect.center = (self.x, self.y)
-
 class Machado6(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -7332,7 +7422,7 @@ class Osso6(pygame.sprite.Sprite):
         self.osso_on()
         self.Colisao()
 
-#------------Cenario---------#
+#------------Cenario-----------#
 class Nuvem(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -7392,7 +7482,6 @@ class Nuvem(pygame.sprite.Sprite):
                 self.velocidade = -0.1
         else:
             self.velocidade = -1
-
 class Nuvem2(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -7445,7 +7534,6 @@ class Nuvem2(pygame.sprite.Sprite):
                 self.velocidade = -0.1
         else:
             self.velocidade = -1
-
 class Nuvem3(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -7499,7 +7587,6 @@ class Nuvem3(pygame.sprite.Sprite):
                 self.velocidade = -0.1
         else:
             self.velocidade = -1
-
 class Nuvem4(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -7553,7 +7640,6 @@ class Nuvem4(pygame.sprite.Sprite):
                 self.velocidade = -0.1
         else:
             self.velocidade = -1
-
 class Nuvem5(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -7660,7 +7746,6 @@ class Montanha(pygame.sprite.Sprite):
                 self.velocidade = 0
         else:
             self.velocidade = -0.5
-
 class Montanhas(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -7717,7 +7802,6 @@ class Montanhas(pygame.sprite.Sprite):
                 self.velocidade = 0
         else:
             self.velocidade = -0.5
-
 class Montanhas2(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -7884,7 +7968,6 @@ class Elementos(pygame.sprite.Sprite):
 
         else:
             self.velocidade = -2
-
 class Elementos2(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -7961,7 +8044,6 @@ class Elementos2(pygame.sprite.Sprite):
                 self.velocidade = 0
         else:
             self.velocidade = -2
-
 class Elementos3(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -8125,7 +8207,6 @@ class Grama(pygame.sprite.Sprite):
                 self.velocidade = 0
         else:
             self.velocidade = -2
-
 class Grama2(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -8182,7 +8263,6 @@ class Grama2(pygame.sprite.Sprite):
 
         else:
             self.velocidade = -2
-
 class Grama3(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -8310,10 +8390,10 @@ class Tufo(pygame.sprite.Sprite):
         if leveis.boss:
             self.velocidade *= 0.98
 
-            if self.velocidade < 2:
-                self.velocidade = 2
+            if self.velocidade < 1: #2
+                self.velocidade = 1 #2
         else:
-            self.velocidade = -2
+            self.velocidade = 3 #2 ou mais
 
 class Chao(pygame.sprite.Sprite):
     def __init__(self):
@@ -8366,7 +8446,6 @@ class Chao(pygame.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.rect.center = i[0], i[1]
             tela.blit(self.image, self.rect)
-
 class Chao2(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -8417,7 +8496,6 @@ class Chao2(pygame.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.rect.center = i[0], i[1]
             tela.blit(self.image, self.rect)
-
 class Chao3(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -8503,7 +8581,6 @@ class Dia(pygame.sprite.Sprite):
         self.image = self.fase1
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
-
 class Noite(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -8537,7 +8614,6 @@ class Noite(pygame.sprite.Sprite):
         self.image = self.noite
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
-
 class Chaodia(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -8590,7 +8666,6 @@ class Chaodia(pygame.sprite.Sprite):
         self.image = self.fase1
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
-
 class Chaonoite(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -8665,7 +8740,6 @@ class Sol(pygame.sprite.Sprite):
         self.y += self.velocidade
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
-
 class Lua(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -8713,7 +8787,6 @@ canguru.bumerangue = bumerangue
 #-----------------Itens-------------------#
 mochila = Mochila()
 item_vida = Item_vida()
-
 #------------------Boss------------------#
 tasmania = Miniboss()
 machado = Machado()
@@ -8723,7 +8796,6 @@ machado4 = Machado4()
 machado5 = Machado5()
 machado6 = Machado6()
 #----------------Inimigos----------------#
-
 #ratos
 rato = Rato()
 rato2 = Rato2()
@@ -8785,7 +8857,6 @@ montanhas2=Montanhas2()
 #-------------Gerenciador------------#
 gerenciador = Gerenciador()
 #---------junção classes--------------#
-
 canguru.vidas_numeros = vidas_numeros
 montanhas.montanha = montanha
 montanhas2.montanhas = montanhas
