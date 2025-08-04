@@ -18,7 +18,7 @@ loja_item = os.path.join(cidade,'elementos/itens')
 loja_boss = os.path.join(cidade,'elementos/boss')
 #carrocas
 carroca_deserto = pygame.image.load(os.path.join(loja_cenarios, 'deserto.png')).convert_alpha()
-carroca_chao = pygame.image.load(os.path.join(loja_cenarios,'chão.png')).convert_alpha()
+
 carroca_canguru = pygame.image.load(os.path.join(loja_sprites,'canguru.png')).convert_alpha()
 carroca_bumerangue = pygame.image.load(os.path.join(loja_sprites,'bumerangue.png')).convert_alpha()
 carroca_lagarto = pygame.image.load(os.path.join(loja_sprites,'lagarto.png')).convert_alpha()
@@ -49,7 +49,7 @@ carroca_gameover_continue_quebrado = pygame.image.load(os.path.join(loja_menu,'c
 carroca_vida = pygame.image.load(os.path.join(loja_item,'vida.png')).convert_alpha()
 carroca_menu_efeitos = pygame.image.load(os.path.join(loja_menu,'efeitos.png')).convert_alpha()
 carroca_mochila = pygame.image.load(os.path.join(loja_item,'bag6.png')).convert_alpha()
-carroca_progresso = pygame.image.load(os.path.join(loja_menu,'progresso.png')).convert_alpha()
+
 carroca_boss_base = pygame.image.load(os.path.join(loja_boss,'tasmania_base.png')).convert_alpha()
 carroca_boss_base_inversa = pygame.image.load(os.path.join(loja_boss,'tasmania_base2.png')).convert_alpha()
 carroca_boss_ataque = pygame.image.load(os.path.join(loja_boss,'tasmania_ataque.png')).convert_alpha()
@@ -62,3 +62,43 @@ carroca_boss_derrotado = pygame.image.load(os.path.join(loja_boss,'tasmania_derr
 carroca_machado = pygame.image.load(os.path.join(loja_boss,'machado.png')).convert_alpha()
 carroca_machadob= pygame.image.load(os.path.join(loja_boss,'machadob.png')).convert_alpha()
 carroca_boss_pulo = pygame.image.load(os.path.join(loja_boss,'tasmania_pulo.png')).convert_alpha()
+carroca_animacao_dano_boss = pygame.image.load(os.path.join(loja_boss,'animacao_dano_tasmania.png')).convert_alpha()
+carroca_animacao_escudo_boss = pygame.image.load(os.path.join(loja_boss,'animacao_escudo_boss.png')).convert_alpha()
+
+carroca_pause = pygame.image.load(os.path.join(loja_menu,'pause.png')).convert_alpha()
+carroca_stage_clear = pygame.image.load(os.path.join(loja_menu,'stage_clear.png')).convert_alpha()
+carroca_score = pygame.image.load(os.path.join(loja_menu,'score.png')).convert_alpha()
+carroca_seta = pygame.image.load(os.path.join(loja_boss,'seta.png')).convert_alpha()
+carroca_marcador_boss = pygame.image.load(os.path.join(loja_boss,'marcador_boss.png')).convert_alpha()
+
+carroca_menu_continue = pygame.image.load(os.path.join(loja_menu,'continue_menu.png')).convert_alpha()
+carroca_menu_shop = pygame.image.load(os.path.join(loja_menu,'shop.png')).convert_alpha()
+carroca_menu_lvl = pygame.image.load(os.path.join(loja_menu,'lvl.png')).convert_alpha()
+carroca_menu_new_game = pygame.image.load(os.path.join(loja_menu,'new_game.png')).convert_alpha()
+carroca_back = pygame.image.load(os.path.join(loja_menu,'back.png')).convert_alpha()
+
+carroca_kangarunn = pygame.image.load(os.path.join(loja_menu,'kangaruun2.png')).convert_alpha()
+carroca_menu_image = pygame.image.load(os.path.join(loja_menu,'menu2.png')).convert_alpha()
+carroca_menu_play= pygame.image.load(os.path.join(loja_menu,'play.png')).convert_alpha()
+carroca_menu_exit = pygame.image.load(os.path.join(loja_menu,'exit.png')).convert_alpha()
+carroca_menu_tutorial = pygame.image.load(os.path.join(loja_menu,'tutorial.png')).convert_alpha()
+carroca_menu_settings = pygame.image.load(os.path.join(loja_menu,'settings.png')).convert_alpha()
+
+
+
+carroca_cursor_play = pygame.image.load(os.path.join(loja_menu,'cursor_play.png')).convert_alpha()
+carroca_cursor_exit = pygame.image.load(os.path.join(loja_menu,'cursor_exit.png')).convert_alpha()
+carroca_cursor_settings = pygame.image.load(os.path.join(loja_menu,'cursor_settings.png')).convert_alpha()
+carroca_cursor_shop = pygame.image.load(os.path.join(loja_menu,'cursor_shop2.png')).convert_alpha()
+
+carroca_cursor_new_game = pygame.image.load(os.path.join(loja_menu,'cursor_new_game2.png')).convert_alpha()
+carroca_cursor_continue = pygame.image.load(os.path.join(loja_menu,'cursor_continue.png')).convert_alpha()
+carroca_cursor_lvl = pygame.image.load(os.path.join(loja_menu,'cursor_lvl.png')).convert_alpha()
+carroca_cursor_tutorial = pygame.image.load(os.path.join(loja_menu,'cursor_tutorial.png')).convert_alpha()
+carroca_cursor_back= pygame.image.load(os.path.join(loja_menu,'cursor_back.png')).convert_alpha()
+
+carroca_progresso = pygame.image.load(os.path.join(loja_menu,'progresso.png')).convert_alpha()
+carroca_progresso_full = pygame.image.load(os.path.join(loja_menu,'progresso_full.png')).convert_alpha()
+carroca_progresso_marca = pygame.image.load(os.path.join(loja_menu,'progresso_marca.png')).convert_alpha()
+
+carroca_chao = pygame.image.load(os.path.join(loja_cenarios,'chao_dividido.png')).convert_alpha()
