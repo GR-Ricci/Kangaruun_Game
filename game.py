@@ -119,6 +119,9 @@ while True:
             pygame.quit()
             sys.exit()
 
+        if event.type == KEYUP:
+            if event.key == K_DOWN:
+                canguru.agachado = False
         if event.type == KEYDOWN:
 
             if not menu.menu_on and not canguru.morreu:
@@ -238,14 +241,17 @@ while True:
                     cursor.baixo_final = False
 
             if not canguru.morreu and not canguru.loading_battle and not leveis.inimigos_off and jogo_on :
+                if event.key == K_UP:
+                    canguru.pulo = True
+                    canguru.agachado = False
+                    canguru.animar = False
 
                 if event.key == K_RIGHT:
                     canguru.avanco = True
+
                 if event.key == K_LEFT:
                     canguru.volta_rapido = True
-                if event.key == K_UP:  # Quando pressionado para pular
-                    canguru.agachado = False
-                    canguru.pulo = True  # Ativa o pulo
+
                 if event.key == K_DOWN:  # Quando pressionado para agachar
                     if canguru.pulando and not 485 <= canguru.rect.centery <= 530:
                         canguru.queda = True  # Ativa a queda se estiver pulando
