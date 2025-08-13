@@ -38,12 +38,3 @@ conda install -c cogsci pygame
 # 1. Download the .whl file matching your Python version and OS
 # 2. Install with:
 # pip install path/to/file.whl
-
-2. **Download the Game** 
-git clone https://github.com/SEU-USUARIO/Canguru-Game.git
-
-# Enter the folder
-cd Canguru-Game
-
-# Run the game
-python game.py
