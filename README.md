@@ -10,7 +10,7 @@ A simple game developed in **Python** using the **Pygame** library.
 
 1. **Install Pygame**  
   ```bash
-# ---------- Pygame Installation ----------
+#( ---------- Pygame Installation ----------
 
 # NOTE: You can run these commands either in your system terminal
 # (Windows, Mac, Linux) or in the Python console (e.g., PyCharm).  
@@ -37,4 +37,15 @@ conda install -c cogsci pygame
 # ----- Via .whl file (optional, rare) -----
 # 1. Download the .whl file matching your Python version and OS
 # 2. Install with:
-# pip install path/to/file.whl
+# pip install path/to/file.whl)
+  ```
+
+2. **Download Game**  
+ ```bash
+git clone https://github.com/SEU-USUARIO/Canguru-Game.git
+cd Canguru-Game
+  ```
+
+3. **Run the Game**
+```bash
+python game.py
