@@ -1,4 +1,4 @@
-# 🦘 Canguru Game
+# 🦘 Kangarunn Game
 
 A simple game developed in **Python** using the **Pygame** library.
 
