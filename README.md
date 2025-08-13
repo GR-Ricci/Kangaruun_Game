@@ -10,10 +10,36 @@ A simple game developed in **Python** using the **Pygame** library.
 
 1. **Install Pygame**  
   ```bash
-# Install Pygame
-pip install pygame
+# ---------- Pygame Installation ----------
 
-# Download the game
+# NOTE: You can run these commands either in your system terminal
+# (Windows, Mac, Linux) or in the Python console (e.g., PyCharm).  
+
+# ----- Windows -----
+pip install pygame
+# or, to ensure the correct pip is used:
+python -m pip install pygame
+
+# ----- Mac -----
+# If using Homebrew to manage Python:
+brew install python   # only if Python 3 is not installed
+python3 -m pip install pygame
+
+# ----- Linux (Ubuntu/Debian) -----
+sudo apt update
+sudo apt install python3-pip  # only if pip is missing
+python3 -m pip install pygame
+
+# ----- Conda (optional) -----
+# Works on any system with Anaconda/Miniconda installed:
+conda install -c cogsci pygame
+
+# ----- Via .whl file (optional, rare) -----
+# 1. Download the .whl file matching your Python version and OS
+# 2. Install with:
+# pip install path/to/file.whl
+
+2. **Download the Game** 
 git clone https://github.com/SEU-USUARIO/Canguru-Game.git
 
 # Enter the folder
