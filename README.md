@@ -9,7 +9,7 @@ https://drive.google.com/file/d/14E9QnRBV5fjDfLgQZGxZ2y_uRY1FND83/view?usp=drive
 - Python 3.10 or higher
 - Pygame library
 
-## 🚀 How to Run
+## 🎮 How to Run
 
 1. **Install Pygame**  
   ```bash
