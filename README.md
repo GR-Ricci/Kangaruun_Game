@@ -4,6 +4,7 @@ A simple game developed in **Python** using the **Pygame** library.
 
 ## 📦 Requirements
 - Python 3.10 or higher
+- Pygame library
 
 ## 🚀 How to Run
 
