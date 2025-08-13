@@ -50,7 +50,5 @@ cd Canguru-Game
 ```bash
 python game.py
 
-<video width="480" controls>
-  <source src="elementos/trailer/Kangaruun.mp4" type="video/mp4">
-  Seu navegador não suporta vídeo.
-</video>
+
+
