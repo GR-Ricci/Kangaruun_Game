@@ -1,4 +1,4 @@
-# 🦘 Kangarunn Game
+# 🦘 Kangaruun Game
 
 A simple game developed in **Python** using the **Pygame** library.
 
