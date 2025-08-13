@@ -10,7 +10,7 @@ A simple game developed in **Python** using the **Pygame** library.
 
 1. **Install Pygame**  
   ```bash
-#( ---------- Pygame Installation ----------
+---------- Pygame Installation ----------
 
 # NOTE: You can run these commands either in your system terminal
 # (Windows, Mac, Linux) or in the Python console (e.g., PyCharm).  
@@ -49,3 +49,8 @@ cd Canguru-Game
 3. **Run the Game**
 ```bash
 python game.py
+
+<video width="480" controls>
+  <source src="elementos/trailer/Kangaruun.mp4" type="video/mp4">
+  Seu navegador não suporta vídeo.
+</video>
