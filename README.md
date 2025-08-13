@@ -49,6 +49,3 @@ cd Canguru-Game
 3. **Run the Game**
 ```bash
 python game.py
-
-
-
