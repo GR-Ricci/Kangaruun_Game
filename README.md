@@ -45,8 +45,8 @@ conda install -c cogsci pygame
 
 2. **Download Game**  
  ```bash
-git clone https://github.com/SEU-USUARIO/Kangaruun-Game.git
-cd Kangaruun-Game
+git clone https://github.com/SEU-USUARIO/Kangaruun_Game.git
+cd Kangaruun_Game
   ```
 
 3. **Run the Game**
