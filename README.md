@@ -1,7 +1,7 @@
 # 🦘 Kangaruun Game
 
 A simple game developed in **Python** using the **Pygame** library.
-
+[![Abrir no GitPod](https://img.shields.io/badge/▶️_Play-GitPod-purple)](https://gitpod.io/#https://github.com/seu-usuario/seu-repositorio)
 # 🕹️ Trailer Game
 https://drive.google.com/file/d/14E9QnRBV5fjDfLgQZGxZ2y_uRY1FND83/view?usp=drive_link
 
