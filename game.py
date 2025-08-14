@@ -43,6 +43,27 @@ def Reset():
     rato5.__init__()
     rato6.__init__()
 
+<<<<<<< HEAD
+    # -------- Menus --------
+    menu.__init__()
+    tutorial_menu.__init__()
+    paginas_tutorial.__init__()
+    kangaruun.__init__()
+    play.__init__()
+    shop.__init__()
+    exit.__init__()
+    settings.__init__()
+    new_game.__init__()
+    continue_menu.__init__()
+    lvl.__init__()
+    tutorial.__init__()
+    back_play.__init__()
+    cursor.__init__()
+    efeitos_menu.__init__()
+    pause.__init__()
+    stage_clear.__init__()
+    score.__init__()
+=======
     osso.__init__( rato, canguru)
     osso2.__init__( rato2, canguru)
     osso3.__init__( rato3, canguru)
@@ -63,6 +84,7 @@ def Reset():
     dingo5.__init__( bumerangue, canguru.bumerangue)
     dingo6.__init__( bumerangue, canguru.bumerangue)
 
+>>>>>>> parent of 70c1924 (trailer add)
     gameover.__init__()
     gameover_continue.__init__()
     gameover_quit.__init__()
@@ -128,7 +150,7 @@ while True:
                 if event.key == K_RETURN and jogo_on:
                     pause.pause = not pause.pause
 
-            if menu.menu_on and not play.menu_play_on:
+            if menu.menu_on and not play.menu_play_on and not tutorial_menu.on:
                 if event.key == K_DOWN and cursor.cima:
                     cursor.cima = False
                     cursor.meio = True
@@ -233,12 +255,41 @@ while True:
                     menu.menu_on = False
                     play.menu_play_on = False
                     jogo_on = True
+                if event.key == K_RETURN and cursor.baixo2:
+                    tutorial_menu.on = True
+                    menu.menu_on = False
+                    play.menu_play_on = False
+                    cursor.cima = False
+                    cursor.meio = False
+                    cursor.baixo = False
+                    cursor.baixo_final = False
                 if event.key == K_RETURN and cursor.baixo_final:
                     play.menu_play_on = False
                     cursor.cima = True
                     cursor.meio = False
                     cursor.baixo = False
                     cursor.baixo_final = False
+
+            elif tutorial_menu.on:
+                cursor.direita = True
+                cursor.esquerda = False
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == K_RIGHT:
+                        if tutorial_menu.pagina < tutorial_menu.max_paginas:
+                            tutorial_menu.pagina += 1
+                    elif event.key == K_LEFT:
+                        if tutorial_menu.pagina > 0:
+                            tutorial_menu.pagina -= 1
+                    if event.key == K_ESCAPE:
+                        tutorial_menu.pagina = 0
+                        tutorial_menu.on = False
+                        menu.menu_on = True
+                        play.menu_play_on = True
+
+
+
+
 
             if not canguru.morreu and not canguru.loading_battle and not leveis.inimigos_off and jogo_on :
                 if event.key == K_UP:
@@ -288,7 +339,6 @@ while True:
         efeitos_menu.update()
         if not play.menu_play_on:
             play.update()
-
             shop.update()
             exit.update()
             settings.update()
@@ -298,6 +348,10 @@ while True:
             lvl.update()
             back_play.update()
             tutorial.update()
+    elif tutorial_menu.on:
+        tutorial_menu.Update()
+        paginas_tutorial.Update()
+
 
     else:
         if not pause.pause:
@@ -343,6 +397,7 @@ while True:
             marcador_boss.update()
         if pause.pause:
             game.draw(tela)
+            progresso.update()
 
             tela.blit(tasmania.image, tasmania.rect)
             for x in [machado, machado2, machado3, machado4, machado5, machado6]:

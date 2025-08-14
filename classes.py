@@ -114,12 +114,50 @@ class Tutorial(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = carroca_menu_tutorial
         self.image = pygame.transform.scale(self.image, (612 / 4.3, 408 / 5.5))
-        self.image.fill((128, 128, 128), special_flags=pygame.BLEND_RGB_MULT) #ainda nao programado
         self.rect = self.image.get_rect()
         self.rect.center = (428, 300)
 
     def update(self):
         tela.blit(self.image, self.rect)
+
+#menu tutorial
+class Tutorial_Menu(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.on=False
+        self.max_paginas = 3
+        self.pagina = 0
+        self.x =0
+        self.y =0
+        self.Sprites()
+
+    def Sprites(self):
+        self.images = []
+        for i in range (4):
+            tutorial_paginas = carroca_tutorial_paginas.subsurface((i * 640, 0), (640, 480))
+            self.images.append(tutorial_paginas)
+
+        self.image = self.images[0]
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x, self.y)
+
+    def Update(self):
+        if self.on:
+            self.image = self.images[self.pagina]
+            self.rect = self.image.get_rect()
+            self.rect.topleft = (self.x, self.y)
+            tela.blit(self.image, self.rect)
+class Paginas_Tutorial(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.fonte_score = pygame.freetype.Font("Pixeled.ttf", 16)
+
+
+    def Update(self):
+        if tutorial_menu.on:
+            texto, _ = self.fonte_score.render(f'{tutorial_menu.pagina +1} / {tutorial_menu.max_paginas +1}', (255, 0, 0))
+            tela.blit(texto, (570, 10))
+
 
 #efeitos menu
 class Cursor(pygame.sprite.Sprite):
@@ -130,7 +168,8 @@ class Cursor(pygame.sprite.Sprite):
         self.baixo = False
         self.baixo2 = False
         self.baixo_final = False
-
+        self.direita = False
+        self.esquerda = False
 
         self.image = pygame.image.load('elementos/menus/cursor_play.png')
         self.image = pygame.transform.scale (self.image, (653/3.2,433/3.2))
@@ -965,129 +1004,129 @@ class Canguru(pygame.sprite.Sprite):
             bumerangue.rect.center = (-100, -100)
 
     def pular(self):
+        if not self.loading_battle:
+            if self.pulo and not self.pulando:
+                self.agachado = False
+                self.animar = False
+                self.atacando = False
+                self.pulando = True
+                self.pulo = False
+                self.pulo_duplo = True
+                self.gravidade = -27
+                self.image = self.pulo_imagem
+                self.image = pygame.transform.scale(self.image, (315 / 4, 379 / 4))
 
-        if self.pulo and not self.pulando:
-            self.agachado = False
-            self.animar = False
-            self.atacando = False
-            self.pulando = True
-            self.pulo = False
-            self.pulo_duplo = True
-            self.gravidade = -27
-            self.image = self.pulo_imagem
-            self.image = pygame.transform.scale(self.image, (315 / 4, 379 / 4))
+            if pygame.key.get_pressed()[K_DOWN]and pygame.key.get_pressed()[K_UP] and not self.pulando:
+                self.pulo = True
+                self.agachado = False
+                self.animar = False
+                self.atacando = False
+                self.pulando = True
+                self.pulo = False
+                self.pulo_duplo = True
+                self.gravidade = -27
+                self.image = self.pulo_imagem
 
-        if pygame.key.get_pressed()[K_DOWN]and pygame.key.get_pressed()[K_UP] and not self.pulando:
-            self.pulo = True
-            self.agachado = False
-            self.animar = False
-            self.atacando = False
-            self.pulando = True
-            self.pulo = False
-            self.pulo_duplo = True
-            self.gravidade = -27
-            self.image = self.pulo_imagem
-
-        if self.pulo_duplo and self.pulo and self.pulando and self.queda:
-            self.pulo = False
-            self.pulo_duplo = False
-            self.queda = False
-            self.gravidade = -25
-            self.image = self.pulo_duplo_imagem
-            self.image = pygame.transform.scale(self.image, (315 / 4, 379 / 4))
-
-        if self.pulo_duplo and self.pulo and self.pulando :
-            self.pulo = False
-            self.pulo_duplo = False
-            self.gravidade = -25
-            self.image = self.pulo_duplo_imagem
-            self.image = pygame.transform.scale(self.image, (315 / 4, 379 / 4))
-
-        if self.pulando and self.queda:
-            self.gravidade += 2
-            self.image = self.queda_imagem
-            self.image = pygame.transform.scale(self.image, (438 / 4, 315 / 4))
-
-        if not self.pulando and self.queda:
-            self.pulando = False
-            if not self.atacando:
-                self.animar = True
-            if not self.animar:
-                self.atacando = True
-
-        if not self.pulando and self.agachado:
-            self.animar = False
-            self.atacando = False
-            self.image = self.queda_imagem
-
-        if self.pulando:
-            self.rect.centery += self.gravidade
-            self.gravidade += 2
-
-
-            if self.rect.centery >= 485:  # chão
-                self.rect.centery = 485
-                self.gravidade = 0
-                self.pulando = False
-                self.pulo_avanco = False
-                self.pulo_volta = False
-                self.queda_ar = False
+            if self.pulo_duplo and self.pulo and self.pulando and self.queda:
+                self.pulo = False
+                self.pulo_duplo = False
                 self.queda = False
+                self.gravidade = -25
+                self.image = self.pulo_duplo_imagem
+                self.image = pygame.transform.scale(self.image, (315 / 4, 379 / 4))
+
+            if self.pulo_duplo and self.pulo and self.pulando :
+                self.pulo = False
+                self.pulo_duplo = False
+                self.gravidade = -25
+                self.image = self.pulo_duplo_imagem
+                self.image = pygame.transform.scale(self.image, (315 / 4, 379 / 4))
+
+            if self.pulando and self.queda:
+                self.gravidade += 2
+                self.image = self.queda_imagem
+                self.image = pygame.transform.scale(self.image, (438 / 4, 315 / 4))
+
+            if not self.pulando and self.queda:
+                self.pulando = False
                 if not self.atacando:
                     self.animar = True
                 if not self.animar:
                     self.atacando = True
 
-                teclas = pygame.key.get_pressed()
-                if teclas[pygame.K_DOWN] and not teclas[pygame.K_UP]:
-                    canguru.agachado = True
+            if not self.pulando and self.agachado:
+                self.animar = False
+                self.atacando = False
+                self.image = self.queda_imagem
 
-            if self.rect.centery >= 560:
+            if self.pulando:
+                self.rect.centery += self.gravidade
+                self.gravidade += 2
+
+
+                if self.rect.centery >= 485:  # chão
+                    self.rect.centery = 485
+                    self.gravidade = 0
+                    self.pulando = False
+                    self.pulo_avanco = False
+                    self.pulo_volta = False
+                    self.queda_ar = False
+                    self.queda = False
+                    if not self.atacando:
+                        self.animar = True
+                    if not self.animar:
+                        self.atacando = True
+
+                    teclas = pygame.key.get_pressed()
+                    if teclas[pygame.K_DOWN] and not teclas[pygame.K_UP]:
+                        canguru.agachado = True
+
+                if self.rect.centery >= 560:
+                    self.pulando = False
+                    self.pulo_avanco = False
+                    self.pulo_volta = False
+                    self.queda = False
+                    self.queda_ar = False
+                    teclas = pygame.key.get_pressed()
+                    if teclas[pygame.K_DOWN] and not teclas[pygame.K_UP]:
+                        self.agachado = True
+
+                    if not self.atacando:
+                        self.animar = True
+                    if not self.animar:
+                        self.atacando = True
+
+            if pygame.key.get_pressed()[K_UP] and self.agachado:
+                self.agachado = False
+                self.animar = False
+                self.atacando = False
+                self.atacando = False
+                self.pulo = True
+                self.pulando = True
+                self.gravidade = -25
+                self.image = self.pulo_imagem
+                self.rect = self.image.get_rect(center=self.rect.center)
+
+            if pygame.key.get_pressed()[K_UP] and self.animar:
+                self.agachado = False
+                self.animar = False
+                self.atacando = False
+                self.pulando = True
+                self.pulo = False
+                self.pulo_duplo = True
+                self.gravidade = -27
+                self.image = self.pulo_imagem
+                self.image = pygame.transform.scale(self.image, (315 / 4, 379 / 4))
+            # impede o bug de baixo e cima rapido
+
+            if not self.agachado and not self.pulando:
+                self.pulo = False
                 self.pulando = False
-                self.pulo_avanco = False
-                self.pulo_volta = False
-                self.queda = False
-                self.queda_ar = False
-                teclas = pygame.key.get_pressed()
-                if teclas[pygame.K_DOWN] and not teclas[pygame.K_UP]:
-                    self.agachado = True
-
+                self.agachado = False
                 if not self.atacando:
                     self.animar = True
                 if not self.animar:
                     self.atacando = True
-
-        if pygame.key.get_pressed()[K_UP] and self.agachado:
-            self.agachado = False
-            self.animar = False
-            self.atacando = False
-            self.atacando = False
-            self.pulo = True
-            self.pulando = True
-            self.gravidade = -25
-            self.image = self.pulo_imagem
-            self.rect = self.image.get_rect(center=self.rect.center)
-
-        if pygame.key.get_pressed()[K_UP] and self.animar:
-            self.agachado = False
-            self.animar = False
-            self.atacando = False
-            self.pulando = True
-            self.pulo = False
-            self.pulo_duplo = True
-            self.gravidade = -27
-            self.image = self.pulo_imagem
-            self.image = pygame.transform.scale(self.image, (315 / 4, 379 / 4))
-        # impede o bug de baixo e cima rapido
-
-        if not self.agachado and not self.pulando:
-            self.pulo = False
-            self.pulando = False
-            self.agachado = False
-            if not self.atacando:
-                self.animar = True
-            if not self.animar:
-                self.atacando = True
 
     def Colisao(self):
         if not self.agachado and not self.queda and not self.queda_ar:
@@ -1149,8 +1188,6 @@ class Canguru(pygame.sprite.Sprite):
 
             self.cima = True
             self.baixo = False
-
-
 
             if self.pulando and pygame.key.get_pressed()[K_DOWN]:
                 self.baixo = True
@@ -1789,6 +1826,7 @@ class Miniboss(pygame.sprite.Sprite): #rect do bumerangue
         self.y = 375
         self.contador_teste =0
         self.contador = 0
+        self.contador_batalha = 0
         self.descanso = 0
 
     #controles de ataque
@@ -1933,7 +1971,6 @@ class Miniboss(pygame.sprite.Sprite): #rect do bumerangue
             canguru.parou = False  # Resetar isso também
             canguru.contador_frames_reducao = 0
 
-
             self.contador_reset_b = 0
             self.contador_reset_c = 0
             self.contador_colisao = 0
@@ -1945,8 +1982,7 @@ class Miniboss(pygame.sprite.Sprite): #rect do bumerangue
             self.controle_dano = 0
             self.tomou_dano = False
 
-
-            self.vida = 12
+            self.vida = 9
 
             self.dano = False
             self.indo = True
@@ -1956,6 +1992,8 @@ class Miniboss(pygame.sprite.Sprite): #rect do bumerangue
             self.y = 375
             self.contador_teste = 0
             self.contador = 0
+            self.contador_batalha = 0
+
             self.descanso = 0
 
             # controles de ataque
@@ -2010,7 +2048,7 @@ class Miniboss(pygame.sprite.Sprite): #rect do bumerangue
             self.contador_animacao2 = 0
             self.contador_animacao3 = 0
             self.contador_animacao4 = 0
-            # mudar nomes pra contador animacao ataque e ataqueb
+
             self.machado1 = False
             self.machado2 = False
             self.machado2_indo = False
@@ -2039,7 +2077,7 @@ class Miniboss(pygame.sprite.Sprite): #rect do bumerangue
             self.tomou_dano = False
 
 
-            self.vida = 15
+            self.vida = 9
 
             self.dano = False
 
@@ -2050,6 +2088,8 @@ class Miniboss(pygame.sprite.Sprite): #rect do bumerangue
             self.y = 375
             self.contador_teste = 0
             self.contador = 0
+            self.contador_batalha = 0
+
             self.descanso = 0
 
             # controles de ataque
@@ -2550,7 +2590,7 @@ class Miniboss(pygame.sprite.Sprite): #rect do bumerangue
             self.velocidade_animacao_base2 = 0.15
             self.velocidade_animacao_avanco = 0.35
             self.velocidade_avanco = 12
-            self.velocidade_animacao_vulneravel = 0.15 #ok
+            self.velocidade_animacao_vulneravel = 0.15
             self.velocidade_animacao_ataque = 0.15
             self.velocidade_animacao_ataque2 = 0.13
             self.velocidade_animacao_ataque3 = 0.15
@@ -2558,17 +2598,17 @@ class Miniboss(pygame.sprite.Sprite): #rect do bumerangue
             self.velocidade_pulo = 0.35
             self.velocidade_pulando = 12
         elif leveis.boss_c:
-            self.velocidade_animacao_base = 0.15
-            self.velocidade_animacao_base2 = 0.15
-            self.velocidade_animacao_avanco = 0.38
-            self.velocidade_avanco = 14
-            self.velocidade_animacao_vulneravel = 0.15  # ok
-            self.velocidade_animacao_ataque = 0.15
-            self.velocidade_animacao_ataque2 = 0.13
+            self.velocidade_animacao_base = 0.13
+            self.velocidade_animacao_base2 = 0.13
+            self.velocidade_animacao_avanco = 0.28
+            self.velocidade_avanco = 12
+            self.velocidade_animacao_vulneravel = 0.13
+            self.velocidade_animacao_ataque = 0.13
+            self.velocidade_animacao_ataque2 = 0.11
             self.velocidade_animacao_ataque3 = 0.13
-            self.velocidade_animacao_ataque4 = 0.13
+            self.velocidade_animacao_ataque4 = 0.11
             self.velocidade_pulo = 0.25
-            self.velocidade_pulando = 12
+            self.velocidade_pulando = 9
 
     def Animacao(self):
 
@@ -2927,7 +2967,9 @@ class Miniboss(pygame.sprite.Sprite): #rect do bumerangue
                  self.x -= 2.1
 
             if self.battle:
-                self.Ataques()
+                self.contador_batalha +=1
+                if self.contador_batalha > 15:
+                    self.Ataques()
             if self.chao:
                 self.x =0
             if self.base2:
@@ -3281,10 +3323,8 @@ class Machado5(pygame.sprite.Sprite):
         self.Sprites()
 
     def Dificuldade(self):
-        if leveis.boss_b:
+        if not leveis.boss_a:
             self.velocidade = 15
-        if leveis.boss_c:
-            self.velocidade = 17
 
     def Sprites(self):
         self.machado = []
@@ -3318,12 +3358,12 @@ class Machado5(pygame.sprite.Sprite):
             self.contador += 0.25
 
     def Colisao(self):
-        self.machado1_hitbox = pygame.Rect(self.rect.x+5, self.rect.y + 5, 40, 50)
-        #pygame.draw.rect(tela, (250, 200, 250), self.machado1_hitbox, 2)
+        self.machado5_hitbox = pygame.Rect(self.rect.x+5, self.rect.y + 5, 40, 50)
+        #pygame.draw.rect(tela, (250, 200, 250), self.machado5_hitbox, 2)
 
         canguru_hitbox = canguru.Colisao()
         for v in canguru_hitbox:
-            if self.machado1_hitbox.colliderect(v):
+            if self.machado5_hitbox.colliderect(v):
                 if canguru.contador_colisao == 0:
                     vidas_rosto.dano = True
                     vidas_numeros.dano = True
@@ -3407,7 +3447,7 @@ class Machado5(pygame.sprite.Sprite):
                     if self.contador_reset >= 40:
                         self.reset_machado()
                 elif leveis.boss_c:
-                    if self.contador_reset >= 35:
+                    if self.contador_reset >= 40:
                         self.reset_machado()
 
 
@@ -3436,10 +3476,6 @@ class Machado6(pygame.sprite.Sprite):
         self.x, self.y = tasmania.rect.center
         self.machado_disparado = False
         self.Sprites()
-
-    def Dificuldade(self):
-        if leveis.boss_b:
-            self.velocidade = 20
 
     def Sprites(self):
         self.machado = []
@@ -3471,12 +3507,12 @@ class Machado6(pygame.sprite.Sprite):
             self.contador += 0.25
 
     def Colisao(self):
-        self.machado1_hitbox = pygame.Rect(self.rect.x+5, self.rect.y + 5, 40, 50)
-        #pygame.draw.rect(tela, (250, 200, 250), self.machado1_hitbox, 2)
+        self.machado6_hitbox = pygame.Rect(self.rect.x+5, self.rect.y + 5, 40, 50)
+        #pygame.draw.rect(tela, (250, 200, 250), self.machado6_hitbox, 2)
 
         canguru_hitbox = canguru.Colisao()
         for v in canguru_hitbox:
-            if self.machado1_hitbox.colliderect(v):
+            if self.machado6_hitbox.colliderect(v):
                 if canguru.contador_colisao == 0:
                     vidas_rosto.dano = True
                     vidas_numeros.dano = True
@@ -3494,25 +3530,25 @@ class Machado6(pygame.sprite.Sprite):
             # Se o machado foi disparado, ele segue voando
             if self.machado_disparado:
                 self.contador_reset += 1
-                if self.ataque3:
-                    self.x += 20
+                if self.ataque3: #ataque depois do pulo
+                    self.x += 18
 
+                elif self.ataque2: #ataque no pulo
+                    self.y += 16
 
-                elif self.ataque2:
-                    self.y += 20
-
-                elif self.ataque1:
-                    self.x -= 20
+                elif self.ataque1: #ataque antes do pulo
+                    self.x -= 17
+                    if self.rect.x <=100:
+                        self.x -= 10
 
                 self.rect.center = (int(self.x), int(self.y))
 
                 self.Colisao()
                 self.Animacao()
-                self.Dificuldade()
                 tela.blit(self.image, self.rect)
 
                 # Reset se sair da tela ou atingir o alvo
-                if self.contador_reset >= 23:
+                if self.contador_reset >= 28:
                     self.reset_machado()
 
             # Se não está em movimento, apenas fica preso no personagem
@@ -9216,6 +9252,8 @@ continue_menu = Continue_menu()
 lvl = Lvl()
 tutorial = Tutorial()
 back_play = Back_play()
+tutorial_menu = Tutorial_Menu()
+paginas_tutorial = Paginas_Tutorial()
 
 cursor = Cursor()
 efeitos_menu = Efeito_menu()

@@ -16,6 +16,7 @@ loja_efeitos = os.path.join(cidade,'elementos/efeitos')
 loja_menu = os.path.join(cidade,'elementos/menus')
 loja_item = os.path.join(cidade,'elementos/itens')
 loja_boss = os.path.join(cidade,'elementos/boss')
+loja_tutorial = os.path.join(cidade,'elementos/tutorial')
 #carrocas
 carroca_deserto = pygame.image.load(os.path.join(loja_cenarios, 'deserto.png')).convert_alpha()
 
@@ -102,3 +103,5 @@ carroca_progresso_full = pygame.image.load(os.path.join(loja_menu,'progresso_ful
 carroca_progresso_marca = pygame.image.load(os.path.join(loja_menu,'progresso_marca.png')).convert_alpha()
 
 carroca_chao = pygame.image.load(os.path.join(loja_cenarios,'chao_dividido.png')).convert_alpha()
+
+carroca_tutorial_paginas =pygame.image.load(os.path.join(loja_tutorial,'tutorial_paginas.png')).convert_alpha()
