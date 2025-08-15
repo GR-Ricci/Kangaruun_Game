@@ -1,7 +1,6 @@
 from random import randint
 from random import choice
 import pygame.transform
-
 import math
 from recursos import*
 from pygame.locals import *
@@ -151,7 +150,7 @@ class Tutorial_Menu(pygame.sprite.Sprite):
 class Paginas_Tutorial(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.fonte_score = pygame.freetype.Font("Pixeled.ttf", 16)
+        self.fonte_score = pygame.freetype.Font(carroca_fonte_pixel, 16)
 
 
     def Update(self):
@@ -172,7 +171,7 @@ class Cursor(pygame.sprite.Sprite):
         self.direita = False
         self.esquerda = False
 
-        self.image = pygame.image.load('elementos/menus/cursor_play.png')
+        self.image = carroca_cursor_play
         self.image = pygame.transform.scale (self.image, (653/3.2,433/3.2))
         self.rect = self.image.get_rect()
         self.rect.center = (-100,-100)
@@ -181,7 +180,7 @@ class Cursor(pygame.sprite.Sprite):
         tela.blit(self.image, self.rect)
         if menu.menu_on and not play.menu_play_on:
             if self.cima:
-                self.image = pygame.image.load('elementos/menus/cursor_play.png')
+                self.image = carroca_cursor_play
                 self.image = pygame.transform.scale (self.image, (653/4.5,433/4.5))
                 self.rect = self.image.get_rect()
                 self.rect.center = (570,120)
@@ -578,7 +577,7 @@ class Leveis():
         self.pontos = 0
         self.contador = 0
         self.fonte = pygame.font.SysFont('calibri', 20, False, False)
-        self.fonte_score =  pygame.freetype.Font("Pixeled.ttf", 16)
+        self.fonte_score =  pygame.freetype.Font(carroca_fonte_pixel, 16)
         self.fonte_score.pad = True
         self.boss = False
         self.boss_a = False
@@ -647,10 +646,8 @@ class Leveis():
         elif self.pontos >= 5:
             self.lvl_1 = True
             self.lvl_0 = False
-
         else:
             self.lvl_0 = True
-
 
     def update(self):
         if not canguru.morreu and not self.fim:
@@ -892,21 +889,20 @@ class Canguru(pygame.sprite.Sprite):
 
         self.canguru_agachado = [
             pygame.transform.scale(
-                pygame.image.load('elementos/sprites/canguru/deitado_1.png'),
+                carroca_canguru_deitado1,
                 (438 / 4, 315 / 4)  # Tamanho corrigido
             ),
             pygame.transform.scale(
-                pygame.image.load('elementos/sprites/canguru/deitado_2.png'),
-                (438 / 4, 315 / 4)  # Tamanho corrigido
-            )
+                carroca_canguru_deitado2,
+                (438 / 4, 315 / 4))
         ]
-        self.queda_imagem = pygame.image.load('elementos/sprites/canguru/deitado_1.png')
+        self.queda_imagem = carroca_canguru_deitado1
         self.queda_imagem = pygame.transform.scale(self.queda_imagem, (438 / 4, 315 / 4))
 
-        self.pulo_imagem = pygame.image.load('elementos/sprites/canguru/pulo.png')
+        self.pulo_imagem = carroca_canguru_pulo
         self.pulo_imagem = pygame.transform.scale(self.pulo_imagem, (315 / 4, 379 / 4))
 
-        self.pulo_duplo_imagem = pygame.image.load('elementos/sprites/canguru/pulo_duplo.png')
+        self.pulo_duplo_imagem = carroca_canguru_pulo_duplo
         self.pulo_duplo_imagem = pygame.transform.scale(self.pulo_duplo_imagem, (315 / 4, 379 / 4))
 
         self.image = self.canguru[int(self.atual)]
@@ -3076,7 +3072,7 @@ class Machado(pygame.sprite.Sprite):
         if leveis.boss_a:
             self.velocidade = 15
         else:
-            self.velocidade = 20
+            self.velocidade = 18#20
 
     def Sprites(self):
         self.machado = []
@@ -3136,7 +3132,7 @@ class Machado2(pygame.sprite.Sprite):
         if leveis.boss_a:
             self.velocidade = 17
         else:
-            self.velocidade = 22
+            self.velocidade = 20#22
 
     def Sprites(self):
         self.machado = []
@@ -3198,7 +3194,7 @@ class Machado3(pygame.sprite.Sprite):
         if leveis.boss_a:
             self.velocidade = 15
         else:
-            self.velocidade = 20
+            self.velocidade = 18#20
 
 
     def Sprites(self):
@@ -3257,7 +3253,7 @@ class Machado4(pygame.sprite.Sprite):
         if leveis.boss_a:
             self.velocidade = 17
         else:
-            self.velocidade = 22
+            self.velocidade = 20#22
 
 
 
@@ -8202,13 +8198,13 @@ class Montanha(pygame.sprite.Sprite):
         if self.contador == 0:
             self.x = 320
             self.y = 235
-            self.montanha = pygame.image.load('elementos/cenario/montanha2.png')
+            self.montanha = carroca_montanha2
             self.montanha = pygame.transform.scale(self.montanha, (1500 / 2, 600 / 2))
 
         elif self.contador == 1:
             self.x = 1100
             self.y = 185
-            self.montanha = pygame.image.load('elementos/cenario/montanha.png')
+            self.montanha = carroca_montanha1
             self.montanha = pygame.transform.scale(self.montanha, (1000, 500))
 
 
@@ -9034,7 +9030,7 @@ class Dia(pygame.sprite.Sprite):
         self.x = 300
         self.y = 230
         self.velocidade = 0
-        self.fase1 = pygame.image.load('elementos/cenario/dia.png')
+        self.fase1 = carroca_dia
         self.fase1 = pygame.transform.scale(self.fase1, (1536 / 2, 1024 / 2))
         self.image = self.fase1
         self.rect = self.image.get_rect()
@@ -9066,7 +9062,7 @@ class Noite(pygame.sprite.Sprite):
         self.x = 300
         self.y = -160
         self.velocidade = 0
-        self.noite = pygame.image.load('elementos/cenario/noite.png')
+        self.noite = carroca_noite
         self.noite = pygame.transform.scale(self.noite, (1536 / 2, 1024 / 2))
         self.image = self.noite
         self.rect = self.image.get_rect()
@@ -9100,7 +9096,7 @@ class Chaodia(pygame.sprite.Sprite):
         self.x = 300
         self.y = 230
         self.velocidade = 10
-        self.fase1 = pygame.image.load('elementos/cenario/chao_dia.png')
+        self.fase1 = carroca_chao_dia
         self.fase1 = pygame.transform.scale(self.fase1, (1536 / 2.2, 1024 / 2.2))
         self.image = self.fase1
         self.rect = self.image.get_rect()
@@ -9155,7 +9151,7 @@ class Chaonoite(pygame.sprite.Sprite):
         self.x = 300
         self.y = 460
         self.velocidade = 10
-        self.fase1 = pygame.image.load('elementos/cenario/chao_noite.png')
+        self.fase1 = carroca_chao_noite
         self.fase1 = pygame.transform.scale(self.fase1, (1536 / 2.2, 1024 / 2.2))
         self.image = self.fase1
         self.rect = self.image.get_rect()
@@ -9198,7 +9194,7 @@ class Sol(pygame.sprite.Sprite):
         self.x = 550
         self.y = -70
         self.velocidade = 0
-        self.sol = pygame.image.load('elementos/cenario/sol.png')
+        self.sol = carroca_sol
         self.sol = pygame.transform.scale(self.sol, (1024/6,1024/6))
         self.image = self.sol
         self.rect = self.image.get_rect()
@@ -9223,7 +9219,7 @@ class Lua(pygame.sprite.Sprite):
         self.x = 100
         self.y = -65
         self.velocidade = 0
-        self.lua = pygame.image.load('elementos/cenario/Lua.png')
+        self.lua = carroca_lua
         self.lua = pygame.transform.scale(self.lua, (1024/6,1024/6))
         self.image = self.lua
         self.rect = self.image.get_rect()

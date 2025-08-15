@@ -1,6 +1,6 @@
 from sys import exit
 import time
-from classes import * #locals ja esta vindo
+from classes import *
 import sys
 def Reset():
     leveis.fim_velocidade = False
