@@ -1,7 +1,6 @@
 from random import randint
 from random import choice
 import pygame.transform
-import asyncio
 
 import math
 from recursos import*
@@ -4918,7 +4917,7 @@ class Lagarto(pygame.sprite.Sprite):
                 else:
                     if ((self.lagarto_hitbox_corpo.colliderect(hitbox) or self.lagarto_hitbox_cabeca.colliderect(hitbox))
                             and ((canguru.cima and self.cima) or (canguru.baixo and self.baixo))):
-                        print("COLIDIU COM O lagarto!")
+                        #print("COLIDIU COM O lagarto!")
                         if canguru.contador_colisao == 0:
                             vidas_rosto.dano = True
                             vidas_numeros.dano = True

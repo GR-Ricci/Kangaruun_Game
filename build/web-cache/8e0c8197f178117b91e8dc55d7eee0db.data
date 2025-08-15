@@ -205,7 +205,7 @@ if PyConfig is None:
     # TODO: build a pyconfig extracted from C here
     PyConfig = {}
     PyConfig["dev_mode"] = 1
-    PyConfig["run_filename"] = "main.py"
+    PyConfig["run_filename"] = "game.py"
 
     # TODO: use location of python js module.
     if __UPY__:
@@ -737,7 +737,7 @@ ________________________
         if cls.is_interactive:
             return
         # if you don't reach that step
-        # your main.py has an infinite sync loop somewhere !
+        # your game.py has an infinite sync loop somewhere !
         DBG("651: starting EventTarget in a few seconds")
 
         print()
@@ -795,7 +795,7 @@ ________________________
                     block = f"{base}.display.{func}()"
                     code = code.replace(block, f"{block};await asyncio.sleep(0)")
 
-        # fix cwd to match a run of main.py from its folder
+        # fix cwd to match a run of game.py from its folder
         realpath = str(main)
         if realpath[0] not in "./":
             realpath = str(Path.cwd() / main)
@@ -1490,7 +1490,7 @@ async def import_site(__file__, run=True):
         from pathlib import Path
 
         embed = False
-        hint = "main.py"
+        hint = "game.py"
 
         is_py = sys.argv[0].endswith(".py")
 
@@ -1574,10 +1574,10 @@ async def import_site(__file__, run=True):
             # file has been retrieved stored in local
         else:
             local = None
-            # no embed, try sys.argv[0] first, but main.py can only be a hint.
+            # no embed, try sys.argv[0] first, but game.py can only be a hint.
             # of what to run in an archive
 
-            if sys.argv[0] == "main.py" or not is_py:
+            if sys.argv[0] == "game.py" or not is_py:
                 source = PyConfig.orig_argv[-1]
                 if is_py:
                     hint = sys.argv[0]
