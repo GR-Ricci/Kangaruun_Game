@@ -1,0 +1,11 @@
+tasks:
+  - name: Instalar dependências e rodar o jogo
+    init: |
+      sudo apt-get update
+      sudo apt-get install -y python3-pip python3-dev libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libfreetype6-dev
+      pip install pygame
+    command: python3 game.py
+
+vscode:
+  extensions:
+    - ms-python.python  # Extensão do Python para o VS Code (opcional)
