@@ -3,7 +3,7 @@
 A simple game developed in **Python** using the **Pygame** library.
 
 # Download the Windows version:
-> [Kangaruun.exe](https://github.com/GR-Ricci/Kangaruun_Game/releases/tag/v1.0)
+> [Kangaruun.exe](https://github.com/GR-Ricci/Kangaruun_Game/releases/tag/v1.0) <
 
 # 🕹️ Trailer Game
 https://drive.google.com/file/d/14E9QnRBV5fjDfLgQZGxZ2y_uRY1FND83/view?usp=drive_link
