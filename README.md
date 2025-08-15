@@ -2,11 +2,15 @@
 
 A simple game developed in **Python** using the **Pygame** library.
 
+# Download the Windows version:
+[Kangaruun.exe](https://github.com/GR-Ricci/Kangaruun_Game/releases/tag/v1.0)
+SHA256: `8ae51fa639e1aa5c538d1bd4378752f61eca889e3051dcd7f66f5b5806a20a50`
+
+
 # 🕹️ Trailer Game
 https://drive.google.com/file/d/14E9QnRBV5fjDfLgQZGxZ2y_uRY1FND83/view?usp=drive_link
 
-Download the Windows version: [Kangaruun.exe](https://github.com/GR-Ricci/Kangaruun_Game/releases/tag/v1.0)
-SHA256: `8ae51fa639e1aa5c538d1bd4378752f61eca889e3051dcd7f66f5b5806a20a50`
+
 
 
 ## 📦 Requirements
