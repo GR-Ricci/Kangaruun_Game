@@ -1,5 +1,7 @@
 import os
 import pygame
+import asyncio
+
 pygame.init()
 
 tela = pygame.display.set_mode((640,480))

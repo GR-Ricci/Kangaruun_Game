@@ -1,6 +1,8 @@
 from random import randint
 from random import choice
 import pygame.transform
+import asyncio
+
 import math
 from recursos import*
 from pygame.locals import *
