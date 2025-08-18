@@ -10,8 +10,7 @@ https://drive.google.com/file/d/14E9QnRBV5fjDfLgQZGxZ2y_uRY1FND83/view?usp=drive
 - [Kangaruun.exe](https://github.com/GR-Ricci/Kangaruun_Game/releases/tag/v1.0) 
 
 # 🎮 Play online:
-- https://replit.com/join/dtsnjxcidc-grriccigabriel
-  /n
+- https://replit.com/join/dtsnjxcidc-grriccigabriel  
 *(Runs in the browser, but with reduced performance)*
 
 ## ▶️ How to Run in Terminal:
