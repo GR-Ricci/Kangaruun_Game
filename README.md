@@ -11,6 +11,7 @@ https://drive.google.com/file/d/14E9QnRBV5fjDfLgQZGxZ2y_uRY1FND83/view?usp=drive
 
 # 🎮 Play online:
 - https://replit.com/join/dtsnjxcidc-grriccigabriel
+  /n
 *(Runs in the browser, but with reduced performance)*
 
 ## ▶️ How to Run in Terminal:
