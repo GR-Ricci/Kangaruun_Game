@@ -863,7 +863,7 @@ class Canguru(pygame.sprite.Sprite):
 
     def get_layer(self):
         # Define a camada de desenho com base no Y
-        return 6.4 if self.baixo else 6.2
+        return 6.4 if self.baixo else 5.9
 
     def Sprites(self):
 
