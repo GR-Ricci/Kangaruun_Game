@@ -3598,7 +3598,7 @@ class Dingo (pygame.sprite.Sprite):
 
     def get_layer(self):
         # Define a camada de desenho com base no Y
-        return 7 if self.y == 300 else 6
+        return 7.1 if self.y == 300 else 6
 
     def Sprites(self):
 
@@ -3787,7 +3787,7 @@ class Dingo2 (pygame.sprite.Sprite):
 
     def get_layer(self):
         # Define a camada de desenho com base no Y
-        return 7 if self.y == 300 else 6
+        return 7.1 if self.y == 300 else 6
 
     def Sprites(self):
         if self.y == 300:
@@ -3982,7 +3982,7 @@ class Dingo3 (pygame.sprite.Sprite):
 
     def get_layer(self):
         # Define a camada de desenho com base no Y
-        return 7 if self.y == 300 else 6
+        return 7.1 if self.y == 300 else 6
 
     def Sprites(self):
 
@@ -4170,7 +4170,7 @@ class Dingo4 (pygame.sprite.Sprite):
 
     def get_layer(self):
         # Define a camada de desenho com base no Y
-        return 7 if self.y == 300 else 6 #<<<baixo alto>>>
+        return 7.1 if self.y == 300 else 6 #<<<baixo alto>>>
 
     def Sprites(self):
 
@@ -4359,7 +4359,7 @@ class Dingo5 (pygame.sprite.Sprite):
 
     def get_layer(self):
         # Define a camada de desenho com base no Y
-        return 7 if self.y == 300 else 6 #<<<<baixo  #alto>>>
+        return 7.1 if self.y == 300 else 6 #<<<<baixo  #alto>>>
 
     def Sprites(self):
 
@@ -4979,7 +4979,7 @@ class Lagarto2(pygame.sprite.Sprite):
 
     def get_layer(self):
         # Define a camada de desenho com base no Y
-        return 8 if self.y == 272 else 6.5
+        return 6.5 if self.y == 272 else 6 #8 / 6.5
 
     def Sprites(self):
 

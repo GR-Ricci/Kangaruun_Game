@@ -11,7 +11,7 @@ relogio = pygame.time.Clock()
 if getattr(sys, 'frozen', False):
     base_path = sys._MEIPASS
 else:
-    base_path = os.path.abspath(".")
+    base_path = os.path.abspath("")
 
 def resource_path(*paths):
     return os.path.join(base_path, *paths)
