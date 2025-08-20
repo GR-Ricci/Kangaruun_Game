@@ -643,7 +643,7 @@ class Leveis():
             self.boss = True
         elif self.pontos >= 380:
             self.boss_perto = True
-        elif self.pontos >= 5:
+        elif self.pontos >= 10:
             self.lvl_1 = True
             self.lvl_0 = False
         else:
