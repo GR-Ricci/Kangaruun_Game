@@ -2,20 +2,18 @@
 
 A simple game developed in **Python** using the **Pygame** library.
 
-# 💾 Download the Windows version:
-- [Kangaruun.exe](https://github.com/GR-Ricci/Kangaruun_Game/releases/tag/v1.0) 
-
 # 🕹️ Trailer Game
 https://drive.google.com/file/d/14E9QnRBV5fjDfLgQZGxZ2y_uRY1FND83/view?usp=drive_link
 
 
+# 💾 Download the Windows version:
+- [Kangaruun.exe](https://github.com/GR-Ricci/Kangaruun_Game/releases/tag/v1.0) 
 
+# 🎮 Play online:
+- https://replit.com/join/dtsnjxcidc-grriccigabriel  
+*(Runs in the browser, but with reduced performance)*
 
-## 📦 Requirements
-- Python 3.10 or higher
-- Pygame library
-
-## 🎮 How to Run
+## ▶️ How to Run in Terminal:
 
 1. **Install Pygame**  
   ```bash
@@ -58,3 +56,8 @@ cd Kangaruun_Game
 3. **Run the Game**
 ```bash
 python game.py
+```
+
+## 📦 Requirements
+- Python 3.10 or higher
+- Pygame library
