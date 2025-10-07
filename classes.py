@@ -6,7 +6,8 @@ from recursos import*
 from pygame.locals import *
 import pygame.freetype
 
-#---------Sistema----------#
+#region#---Sistema---#
+
 #Menu Principal
 class Menu(pygame.sprite.Sprite):
     def __init__(self):
@@ -157,7 +158,6 @@ class Paginas_Tutorial(pygame.sprite.Sprite):
         if tutorial_menu.on:
             texto, _ = self.fonte_score.render(f'{tutorial_menu.pagina +1} / {tutorial_menu.max_paginas +1}', (255, 0, 0))
             tela.blit(texto, (570, 10))
-
 
 #efeitos menu
 class Cursor(pygame.sprite.Sprite):
@@ -575,7 +575,7 @@ class Leveis():
 
         self.inimigos_off = False
         self.pontos = 0
-        self.contador = 0
+        self.contador = 700
         self.fonte = pygame.font.SysFont('calibri', 20, False, False)
         self.fonte_score =  pygame.freetype.Font(carroca_fonte_pixel, 16)
         self.fonte_score.pad = True
@@ -638,6 +638,7 @@ class Leveis():
             self.lvl_1 = False
             self.boss_perto = False
             self.boss = False
+            self.boss_b = False
         elif 405 > self.pontos >= 400:
             self.boss_a = True
             self.boss = True
@@ -762,6 +763,7 @@ class Fases(pygame.sprite.Sprite):
 
     def update(self):
         self.mostrar()
+
 #Sorteador
 class Gerenciador(pygame.sprite.Sprite):
     def __init__(self):
@@ -771,21 +773,52 @@ class Gerenciador(pygame.sprite.Sprite):
 
         self.sorteio = randint (1,13)
         self.grupos = {
-            1: [lagarto, dingo, rato],
-            2: [lagarto, lagarto3, dingo2, rato3],
-            3: [rato2, rato3, dingo5, dingo6, dingo3],
-            4: [lagarto, lagarto3,dingo, dingo2,  rato5, rato2],
-            5: [lagarto2, lagarto3, dingo5, dingo3, dingo],
-            6: [lagarto4, lagarto2,dingo,rato],
-            7: [dingo, rato, rato5, rato],
-            8: [lagarto, lagarto2,dingo, rato, rato4],
+            #fase1
+            1: [lagarto2,lagarto5],
+            2: [rato,lagarto4],
+            3: [dingo,lagarto4],
+            4: [lagarto4, dingo],
+            5: [dingo2, dingo3],
+            6: [rato, rato4],
+            7: [rato,rato5,lagarto3],
+            8: [rato5, dingo, lagarto3],
+            9: [lagarto, dingo, rato2],
 
-            # waves
-            9: [dingo, dingo2, dingo4, dingo5, rato2],
-            10: [dingo, dingo2, dingo3, dingo4, dingo5, dingo6],
-            11: [lagarto, lagarto2, lagarto4, lagarto5,rato3,rato6,dingo4,dingo],
-            12: [rato, rato2, rato3, rato4, rato5,rato6],
-            13: [rato, rato2, rato3,rato6,dingo3,dingo5,lagarto5]} #colocar lagarto 6
+            #waves1
+            10: [dingo, dingo3, dingo5],
+            11: [rato2,rato5,dingo3],
+            12: [rato3,lagarto,lagarto5],
+            13: [lagarto,lagarto3,lagarto5],
+
+            #fase2
+            14: [lagarto,dingo2,lagarto3,rato5],
+            15: [lagarto, lagarto3, dingo2, rato3],
+            16: [rato2, rato3, dingo5, dingo6, dingo3],
+            17: [lagarto,rato2,dingo3,lagarto5,rato6],
+            18: [lagarto4, lagarto2,dingo,rato],
+            19: [dingo, rato, rato5, rato],
+
+
+            #waves2
+            20: [dingo, dingo2, dingo4, dingo5, rato2],
+            21: [rato, rato2,dingo3,rato5, rato6],
+
+            #fase3
+            22: [lagarto, lagarto3, dingo, dingo2, rato5, rato2],
+            23: [dingo, lagarto2, dingo3, lagarto4, rato, rato5],
+            24: [lagarto2, lagarto3, dingo5, dingo3, dingo],
+            25: [lagarto, lagarto2, dingo, rato, rato4,dingo5],
+            26: [rato2, rato3, dingo5, dingo6, dingo3,rato6],
+            27: [lagarto, rato2, dingo3, lagarto5, rato6,lagarto3],
+            28: [lagarto2,rato,rato3,dingo4,lagarto4,dingo5,rato6],
+            29: [lagarto4, lagarto2, dingo, rato,rato3,rato5],
+
+            #waves33
+            30: [rato, rato2, rato3, rato4, rato5, rato6],
+            31: [dingo, dingo2, dingo3, dingo4, dingo5, dingo6],
+            32: [lagarto, lagarto2, lagarto4, lagarto5,rato3,rato6,dingo4,dingo],
+            33: [rato, rato2, rato3,rato6,dingo3,dingo5,lagarto5]}
+
     def sorteador(self):
         grupo_atual = self.grupos[self.sorteio]
         if all(v.spawn_on for v in grupo_atual):
@@ -802,18 +835,33 @@ class Gerenciador(pygame.sprite.Sprite):
                 self.sorteador()
             else:
                 self.tempo +=1
-                if self.sorteio not in [9,10,11,13]:
+                if self.sorteio not in [10,11,12,13,20,21,30,31,32,33]:
                     if self.tempo == 200:
                         self.tempo = 0
-                        self.sorteio = randint (1,13)
-                        self.ligar_gerenciador = True
+                        if leveis.lvl_0 or leveis.lvl_1:
+                            self.sorteio = randint(1, 13)
+                            self.ligar_gerenciador = True
+                        if leveis.lvl_2 or leveis.lvl_3:
+                            self.sorteio = randint(14, 21)
+                            self.ligar_gerenciador = True
+                        if leveis.lvl_4 or leveis.lvl_5:
+                            self.sorteio = randint(22, 33)
+                            self.ligar_gerenciador = True
                 else:
                     if self.tempo == 300:
                         self.tempo = 0
-                        self.sorteio = randint (1,13)
-                        self.ligar_gerenciador = True
+                        if leveis.lvl_0 or leveis.lvl_1:
+                            self.sorteio = randint(1, 13)
+                            self.ligar_gerenciador = True
+                        if leveis.lvl_2 or leveis.lvl_3:
+                            self.sorteio = randint(14, 21)
+                            self.ligar_gerenciador = True
+                        if leveis.lvl_4 or leveis.lvl_5:
+                            self.sorteio = randint(22, 33)
+                            self.ligar_gerenciador = True
+#endregion
 
-#------------Personagem-----------#
+#region#---Personagem---#
 #Canguru
 class Canguru(pygame.sprite.Sprite):
     def __init__(self):
@@ -1510,7 +1558,6 @@ class Item_vida(pygame.sprite.Sprite):
             if canguru.morreu:
                 self.movimento.remove(i)
 
-
     def Colisao(self):
         self.vida_hitbox = pygame.Rect(self.rect.x + 10, self.rect.y + 3, 55, 50)
         pygame.draw.rect(tela, (0, 0, 250), self.vida_hitbox, 2)
@@ -1551,7 +1598,7 @@ class Item_vida(pygame.sprite.Sprite):
 
     def update(self):
         self.Sprites()
-        if not canguru.morreu and not leveis.boss:
+        if not canguru.morreu or (not leveis.boss and self.x >=450):
             self.Animacao()
             for i in self.movimento:
                 self.image = pygame.transform.scale(self.image, (586/8,426/8))
@@ -1796,8 +1843,9 @@ class Colisao(pygame.sprite.Sprite):
                 self.rect.center = (tasmania.rect.x + 290, tasmania.rect.y + 50)
         if self.image:
             tela.blit(self.image, self.rect)
+#endregion
 
-# -------------Boss-------------#
+#region#---Boss---#
 class Miniboss(pygame.sprite.Sprite): #rect do bumerangue
 
     def __init__(self):
@@ -2526,7 +2574,7 @@ class Miniboss(pygame.sprite.Sprite): #rect do bumerangue
                         self.contador = 0
                         self.sorteio_lado = 0
 
-        if self.total >= 7 :
+        if self.total >= 5 :
             self.vulneravel_pronto = True
 
         if self.vulneravel: #ZERAR as repeticoes
@@ -2583,27 +2631,27 @@ class Miniboss(pygame.sprite.Sprite): #rect do bumerangue
             self.velocidade_pulo = 0.25
             self.velocidade_pulando = 8
         elif leveis.boss_b:
-            self.velocidade_animacao_base = 0.15
-            self.velocidade_animacao_base2 = 0.15
+            self.velocidade_animacao_base = 0.12
+            self.velocidade_animacao_base2 = 0.12
             self.velocidade_animacao_avanco = 0.35
-            self.velocidade_avanco = 12
+            self.velocidade_avanco = 10
             self.velocidade_animacao_vulneravel = 0.15
-            self.velocidade_animacao_ataque = 0.15
-            self.velocidade_animacao_ataque2 = 0.13
-            self.velocidade_animacao_ataque3 = 0.15
-            self.velocidade_animacao_ataque4 = 0.13
-            self.velocidade_pulo = 0.35
-            self.velocidade_pulando = 12
+            self.velocidade_animacao_ataque = 0.12
+            self.velocidade_animacao_ataque2 = 0.10
+            self.velocidade_animacao_ataque3 = 0.12
+            self.velocidade_animacao_ataque4 = 0.10
+            self.velocidade_pulo = 0.28
+            self.velocidade_pulando = 10
         elif leveis.boss_c:
-            self.velocidade_animacao_base = 0.13
-            self.velocidade_animacao_base2 = 0.13
-            self.velocidade_animacao_avanco = 0.28
-            self.velocidade_avanco = 12
-            self.velocidade_animacao_vulneravel = 0.13
-            self.velocidade_animacao_ataque = 0.13
-            self.velocidade_animacao_ataque2 = 0.11
-            self.velocidade_animacao_ataque3 = 0.13
-            self.velocidade_animacao_ataque4 = 0.11
+            self.velocidade_animacao_base = 0.12
+            self.velocidade_animacao_base2 = 0.12
+            self.velocidade_animacao_avanco = 0.27
+            self.velocidade_avanco = 10
+            self.velocidade_animacao_vulneravel = 0.15
+            self.velocidade_animacao_ataque = 0.12
+            self.velocidade_animacao_ataque2 = 0.10
+            self.velocidade_animacao_ataque3 = 0.12
+            self.velocidade_animacao_ataque4 = 0.10
             self.velocidade_pulo = 0.25
             self.velocidade_pulando = 9
 
@@ -3045,7 +3093,7 @@ class Marcador_boss(pygame.sprite.Sprite):
         self.rect.center = (self.x, self.y)
 
     def update(self):
-        if leveis.boss_perto and not leveis.boss:
+        if leveis.boss_perto and not leveis.boss and not canguru.morreu:
             self.contador += 1
 
             if self.contador % 36 < 16:
@@ -3375,24 +3423,26 @@ class Machado5(pygame.sprite.Sprite):
             distancia = max(1, abs(delta_x))  # Usamos abs() pois só importa a magnitude
 
             if leveis.boss_b:
-                velocidade_total = 20
+                velocidade_total = 15
                 self.velocidade_x = (delta_x / distancia) * velocidade_total
                 self.velocidade_y = 0  # Zera o Y para não ter movimento vertical
             else:
-                velocidade_total = 22
+                velocidade_total = 20
                 self.velocidade_x = (delta_x / distancia) * velocidade_total
                 self.velocidade_y = 0  # Zera o Y para não ter movimento vertical
         else:  # Se o canguru ESTÁ pulando, mira em X e Y
-            delta_x = self.alvo_x - self.x
+            delta_x = self.alvo_x - self.x - 50
             delta_y = self.alvo_y - self.y
-            distancia = max(1, math.hypot(delta_x, delta_y))  # Distância euclidiana
+            distancia = max(1, math.hypot(delta_x, delta_y))
+
+
 
             if leveis.boss_b:
                 velocidade_total = 20
                 self.velocidade_x = (delta_x / distancia) * velocidade_total
                 self.velocidade_y = (delta_y / distancia) * velocidade_total
             else:
-                velocidade_total = 22
+                velocidade_total = 20
                 self.velocidade_x = (delta_x / distancia) * velocidade_total
                 self.velocidade_y = (delta_y / distancia) * velocidade_total
 
@@ -3574,8 +3624,9 @@ class Machado6(pygame.sprite.Sprite):
 
         self.x, self.y = tasmania.rect.center
         self.rect.center = (self.x, self.y)
+#endregion
 
-#------------inimigos-----------#
+#region#---inimigos---#
 class Dingo (pygame.sprite.Sprite):
     def __init__(self,bumerangue,canguru):
         pygame.sprite.Sprite.__init__(self)
@@ -7912,8 +7963,9 @@ class Osso6(pygame.sprite.Sprite):
     def update(self):
         self.osso_on()
         self.Colisao()
+#endregion
 
-#------------Cenario-----------#
+#region#---Cenario---#
 class Nuvem(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -8929,7 +8981,7 @@ class Chao2(pygame.sprite.Sprite):
 
 
         self.chao = carroca_chao
-        self.chao = pygame.transform.scale(self.chao, (1469/4,1024/4))
+        self.chao = pygame.transform.scale(self.chao, (1469/3,1024/4))
 
         self.image = self.chao
         self.movimento = [[self.x, self.y]]  # apenas uma lista com a posição
@@ -8978,7 +9030,7 @@ class Chao3(pygame.sprite.Sprite):
         self.contador_frames_reducao =0
 
         self.chao = carroca_chao
-        self.chao = pygame.transform.scale(self.chao, (1469/4,1024/4))
+        self.chao = pygame.transform.scale(self.chao, (1469/3,1024/4))
 
         self.image = self.chao
         self.movimento = [[self.x, self.y]]  # apenas uma lista com a posição
@@ -9236,8 +9288,9 @@ class Lua(pygame.sprite.Sprite):
         self.y += self.velocidade
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
+#endregion
 
-#classes----------------------------
+#region instance
 menu = Menu()
 kangaruun = Kangaruun()
 play = Play()
@@ -9380,3 +9433,4 @@ game.add(layer=dingo5.get_layer())
 game.add(layer=dingo6.get_layer())
 game.add(layer=tufo.get_layer())
 game.add(layer=chaodia.get_layer())
+#endregion-----

@@ -7,7 +7,7 @@ tela = pygame.display.set_mode((640,480))
 pygame.display.set_caption("Kangaruun")
 relogio = pygame.time.Clock()
 
-# Base path para PyInstaller
+# [Base path] + OS >>>  para PyInstaller
 if getattr(sys, 'frozen', False):
     base_path = sys._MEIPASS
 else:
@@ -16,7 +16,7 @@ else:
 def resource_path(*paths):
     return os.path.join(base_path, *paths)
 
-# Pastas
+#region Pastas >> Path
 loja_sprites = resource_path('elementos','spritesheet')
 loja_imagens = resource_path('elementos','sprites')
 loja_cenarios = resource_path('elementos','cenario')
@@ -27,10 +27,11 @@ loja_item = resource_path('elementos','itens')
 loja_boss = resource_path('elementos','boss')
 loja_tutorial = resource_path('elementos','tutorial')
 loja_fontes = resource_path('elementos','fontes')
+#endregion
 
+#region Imagens
 # Carregamento de imagens
 carroca_deserto = pygame.image.load(resource_path('elementos','cenario','deserto.png')).convert_alpha()
-
 carroca_canguru = pygame.image.load(resource_path('elementos','spritesheet','canguru.png')).convert_alpha()
 carroca_bumerangue = pygame.image.load(resource_path('elementos','spritesheet','bumerangue.png')).convert_alpha()
 carroca_lagarto = pygame.image.load(resource_path('elementos','spritesheet','lagarto.png')).convert_alpha()
@@ -130,6 +131,9 @@ carroca_canguru_deitado1 = pygame.image.load(resource_path('elementos','sprites'
 carroca_canguru_deitado2 = pygame.image.load(resource_path('elementos','sprites','canguru','deitado_2.png')).convert_alpha()
 carroca_canguru_pulo = pygame.image.load(resource_path('elementos','sprites','canguru','pulo.png')).convert_alpha()
 carroca_canguru_pulo_duplo = pygame.image.load(resource_path('elementos','sprites','canguru','pulo_duplo.png')).convert_alpha()
+#endregion
 
+#region Fonte
 # Fonte
 carroca_fonte_pixel = resource_path('elementos','fontes','Pixeled.ttf')
+#endregion
