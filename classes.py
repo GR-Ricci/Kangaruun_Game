@@ -575,7 +575,7 @@ class Leveis():
 
         self.inimigos_off = False
         self.pontos = 0
-        self.contador = 700
+        self.contador = 0
         self.fonte = pygame.font.SysFont('calibri', 20, False, False)
         self.fonte_score =  pygame.freetype.Font(carroca_fonte_pixel, 16)
         self.fonte_score.pad = True
@@ -911,7 +911,7 @@ class Canguru(pygame.sprite.Sprite):
 
     def get_layer(self):
         # Define a camada de desenho com base no Y
-        return 6.4 if self.baixo else 5.9
+        return 7 if self.baixo else 5.9
 
     def Sprites(self):
 
